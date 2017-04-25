@@ -6,6 +6,7 @@
 #include <QQmlEngine>
 #include <QJSValue>
 #include <QtQml>
+#include <QMap>
 #include <QtDebug>
 #include "jsonmodel.h"
 #include "jsonquery.h"
@@ -16,9 +17,13 @@ class JsonDatabase : public QObject
 public:
     explicit JsonDatabase(QObject *parent = 0);
 
-signals:
-    void updateData(QString modelName);
+    JsonModel * model(QString modelName);
+    bool registerModel(QString modelName, JsonModel *model);
+    bool unregisterModel(QString modelName, bool deleteModel = false);
+
 public slots:
+private:
+    QMap<QString, JsonModel*> m_models;
 };
 
 JsonDatabase *database();
