@@ -30,7 +30,7 @@ public:
 
     QJsonObject jsonObject() const;
 signals:
-    void updated();
+    void updated(QString name);
     void nameChanged();
     void sourceChanged();
 public slots:

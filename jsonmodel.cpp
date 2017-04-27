@@ -5,6 +5,7 @@
 JsonModel::JsonModel(QObject *parent)
     : QObject(parent)
 {
+    connect(this, &JsonModel::updated, database(), &JsonDatabase::updated);
 }
 
 JsonModel::~JsonModel()
@@ -73,7 +74,7 @@ void JsonModel::setData(QVariantMap newData)
         return;
     }
     m_jsonObject = newJsonObj;
-    emit updated();
+    emit updated(m_name);
 }
 
 QJsonObject JsonModel::jsonObject() const

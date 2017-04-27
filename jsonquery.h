@@ -30,7 +30,7 @@ public:
     void setEnabled(bool newEnabled);
 
 private slots:
-    void onModelUpdated();
+    void onModelUpdated(QString modelName);
 signals:
     void modelChanged();
     void queryChanged();
@@ -41,7 +41,6 @@ private:
     QString m_model;
     QStringList m_query;
     bool m_enabled = true;
-    JsonModel *m_modelObject = Q_NULLPTR;
 };
 
 #endif // JSONQUERY_H

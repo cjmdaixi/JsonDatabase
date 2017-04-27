@@ -9,7 +9,7 @@
 JsonQuery::JsonQuery(QObject *parent)
     : QObject(parent)
 {
-
+    connect(database(), &JsonDatabase::updated, this, &JsonQuery::onModelUpdated);
 }
 
 JsonQuery::~JsonQuery()
@@ -24,20 +24,6 @@ QString JsonQuery::model() const
 void JsonQuery::setModel(QString newModel)
 {
     if(m_model == newModel) return;
-
-    // Query the model object from the database
-    auto modelObject = database()->model(newModel);
-    if(modelObject == Q_NULLPTR){
-        qWarning()<<"There is no model with name"<<newModel;
-        return;
-    }
-    if(m_modelObject){
-        disconnect(m_modelObject);
-    }
-
-    m_modelObject = modelObject;
-    // Connect the signal to this query's slot
-    disconnect(m_modelObject, &JsonModel::updated, this, &JsonQuery::onModelUpdated);
 
     m_model = newModel;
     emit modelChanged();
@@ -62,14 +48,15 @@ QVariantMap JsonQuery::values() const
 {
     QVariantMap results;
 
-    if(m_modelObject == Q_NULLPTR)
+    auto modelObject = database()->model(m_model);
+    if(modelObject == Q_NULLPTR)
         return results;
 
     QRegularExpression re("^(?<node>\\w+)(\\[(?<idx>\\d*)\\])?$");
     for(int i = 0; i != m_query.size(); ++i){
         auto &oneQuery = m_query[i];
         auto nodeList = oneQuery.split('.');
-        QJsonValue jsonVal = m_modelObject->jsonObject();
+        QJsonValue jsonVal = modelObject->jsonObject();
         auto foundNode = true;
         for(auto &node : nodeList){
             if(!jsonVal.isObject()){
@@ -124,15 +111,16 @@ void JsonQuery::setEnabled(bool newEnabled)
     m_enabled = newEnabled;
 
     if(m_enabled){
-        connect(m_modelObject, &JsonModel::updated, this, &JsonQuery::onModelUpdated);
+        connect(database(), &JsonDatabase::updated, this, &JsonQuery::onModelUpdated);
     }else{
-        disconnect(m_modelObject, &JsonModel::updated, this, &JsonQuery::onModelUpdated);
+        disconnect(database(), &JsonDatabase::updated, this, &JsonQuery::onModelUpdated);
     }
 
     emit enabledChanged();
 }
 
-void JsonQuery::onModelUpdated()
+void JsonQuery::onModelUpdated(QString modelName)
 {
-    emit valuesChanged();
+    if(m_model == modelName)
+        emit valuesChanged();
 }

@@ -21,29 +21,13 @@ public:
     bool registerModel(QString modelName, JsonModel *model);
     bool unregisterModel(QString modelName, bool deleteModel = false);
 
+signals:
+    void updated(QString modelName);
 public slots:
 private:
     QMap<QString, JsonModel*> m_models;
 };
 
 JsonDatabase *database();
-
-static QObject * json_database_singletontype_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
-{
-    Q_UNUSED(engine)
-    Q_UNUSED(scriptEngine)
-
-    return database();
-}
-
-static void preCreateJsonDatabase()
-{
-    qmlRegisterSingletonType<JsonDatabase>("JsonDatabase", 1, 0, "JsonDatabase", json_database_singletontype_provider);
-    qmlRegisterType<JsonModel>("JsonDatabase", 1, 0, "JsonModel");
-    qmlRegisterType<JsonQuery>("JsonDatabase", 1, 0, "JsonQuery");
-    qDebug()<<"register json database types";
-}
-
-Q_COREAPP_STARTUP_FUNCTION(preCreateJsonDatabase)
 
 #endif // JSONDATABASE_H

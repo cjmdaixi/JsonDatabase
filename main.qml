@@ -19,7 +19,7 @@ Window {
         query: ["widget.debug", "widget.image.src"]
         model: "mymodel"
         onValuesChanged: {
-            console.log(values);
+            console.log(values["@0"], values["@1"]);
         }
     }
 }
