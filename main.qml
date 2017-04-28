@@ -17,7 +17,7 @@ Window {
     JsonQuery{
         id: jsonQuery
         query: ["widget.debug", "widget.image.src"]
-        model: "mymodel"
+        model: jsonModel
         onValuesChanged: {
             console.log(values["@0"], values["@1"]);
         }

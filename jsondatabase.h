@@ -8,8 +8,9 @@
 #include <QtQml>
 #include <QMap>
 #include <QtDebug>
-#include "jsonmodel.h"
-#include "jsonquery.h"
+
+class JsonModel;
+class JsonQuery;
 
 class JsonDatabase : public QObject
 {
@@ -22,8 +23,9 @@ public:
     bool unregisterModel(QString modelName, bool deleteModel = false);
 
 signals:
-    void updated(QString modelName);
+    void updated(JsonModel *model);
 public slots:
+    void onModelUpdated();
 private:
     QMap<QString, JsonModel*> m_models;
 };

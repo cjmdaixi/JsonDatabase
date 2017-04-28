@@ -1,4 +1,6 @@
 #include "jsondatabase.h"
+#include "jsonmodel.h"
+#include "jsonquery.h"
 
 Q_GLOBAL_STATIC(JsonDatabase, gJsonDatabase)
 
@@ -54,4 +56,10 @@ bool JsonDatabase::unregisterModel(QString modelName, bool deleteModel)
     if(deleteModel && model)
         model->deleteLater();
     return true;
+}
+
+void JsonDatabase::onModelUpdated()
+{
+    auto model = qobject_cast<JsonModel*>(sender());
+    emit updated(model);
 }

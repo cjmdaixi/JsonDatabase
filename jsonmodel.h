@@ -30,13 +30,14 @@ public:
 
     QJsonObject jsonObject() const;
 signals:
-    void updated(QString name);
+    void updated();
     void nameChanged();
     void sourceChanged();
 public slots:
 private:
-    QString m_name, m_source;
+    QString m_name = "", m_source;
     QJsonObject m_jsonObject;
+    bool m_initialized = false;
 };
 
 #endif // JSONMODEL_H
