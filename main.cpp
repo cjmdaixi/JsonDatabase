@@ -1,7 +1,6 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QtQml>
-#include "jsonflux.h"
 
 int main(int argc, char *argv[])
 {

@@ -7,6 +7,7 @@ Window {
     width: 640
     height: 480
     title: qsTr("Hello World")
+    property var myarry: []
 
     JsonFluxModel{
         id: jsonModel
@@ -14,7 +15,7 @@ Window {
         name: "mymodel"
     }
 
-    JsonFluxQuery{
+    JsonFluxView{
         id: jsonQuery
         query: ["widget.debug", "widget.image.src"]
         model: jsonModel

@@ -1,6 +1,7 @@
 #include "jsonflux.h"
 #include "jsonfluxmodel.h"
 #include "jsonfluxview.h"
+#include "jsonfluxmodifier.h"
 
 Q_GLOBAL_STATIC(JsonFlux, gJsonFlux)
 
@@ -21,7 +22,8 @@ static void preCreateJsonDatabase()
 {
     qmlRegisterSingletonType<JsonFlux>("JsonFlux", 1, 0, "JsonFlux", json_flux_singletontype_provider);
     qmlRegisterType<JsonFluxModel>("JsonFlux", 1, 0, "JsonFluxModel");
-    qmlRegisterType<JsonFluxView>("JsonFlux", 1, 0, "JsonFluxQuery");
+    qmlRegisterType<JsonFluxView>("JsonFlux", 1, 0, "JsonFluxView");
+    qmlRegisterType<JsonFluxModifier>("JsonFlux", 1, 0, "JsonFluxModifier");
     qDebug()<<"register json flux types";
 }
 
