@@ -1,39 +1,39 @@
-#include "jsonmodel.h"
-#include "jsondatabase.h"
+#include "jsonfluxmodel.h"
+#include "jsonflux.h"
 #include <QtDebug>
 
-JsonModel::JsonModel(QObject *parent)
+JsonFluxModel::JsonFluxModel(QObject *parent)
     : QObject(parent)
 {
-    connect(this, &JsonModel::updated, database(), &JsonDatabase::onModelUpdated);
+    connect(this, &JsonFluxModel::updated, flux(), &JsonFlux::onModelUpdated);
 }
 
-JsonModel::~JsonModel()
+JsonFluxModel::~JsonFluxModel()
 {
-    database()->unregisterModel(m_name);
+    flux()->unregisterModel(m_name);
 }
 
-QString JsonModel::name() const
+QString JsonFluxModel::name() const
 {
     return m_name;
 }
 
-void JsonModel::setName(QString newName)
+void JsonFluxModel::setName(QString newName)
 {
     if(m_name == newName) return;
 
     m_name = newName;
 
-    database()->registerModel(m_name, this);
+    flux()->registerModel(m_name, this);
     emit nameChanged();
 }
 
-QString JsonModel::source() const
+QString JsonFluxModel::source() const
 {
     return m_source;
 }
 
-void JsonModel::setSource(QString newSource)
+void JsonFluxModel::setSource(QString newSource)
 {
     if(m_source == newSource) return;
 
@@ -62,12 +62,12 @@ void JsonModel::setSource(QString newSource)
     emit sourceChanged();
 }
 
-QVariantMap JsonModel::data() const
+QVariantMap JsonFluxModel::data() const
 {
     return m_jsonObject.toVariantMap();
 }
 
-void JsonModel::setData(QVariantMap newData)
+void JsonFluxModel::setData(QVariantMap newData)
 {
     auto newJsonObj = QJsonObject::fromVariantMap(newData);
     if(newJsonObj.isEmpty()){
@@ -78,7 +78,7 @@ void JsonModel::setData(QVariantMap newData)
     emit updated();
 }
 
-QJsonObject JsonModel::jsonObject() const
+QJsonObject JsonFluxModel::jsonObject() const
 {
     return m_jsonObject;
 }

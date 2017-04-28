@@ -4,9 +4,9 @@ QT += qml quick
 CONFIG += c++11
 
 SOURCES += main.cpp \
-    jsondatabase.cpp \
-    jsonmodel.cpp \
-    jsonquery.cpp
+    jsonflux.cpp \
+    jsonfluxmodel.cpp \
+    jsonfluxview.cpp
 
 RESOURCES += qml.qrc
 
@@ -33,6 +33,6 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
-    jsondatabase.h \
-    jsonmodel.h \
-    jsonquery.h
+    jsonflux.h \
+    jsonfluxmodel.h \
+    jsonfluxview.h

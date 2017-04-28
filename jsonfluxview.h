@@ -1,13 +1,13 @@
-#ifndef JSONQUERY_H
-#define JSONQUERY_H
+#ifndef JSONFLUXVIEW_H
+#define JSONFLUXVIEW_H
 
 #include <QObject>
 #include <QVariantMap>
 #include <QQmlParserStatus>
 
-class JsonModel;
+class JsonFluxModel;
 
-class JsonQuery : public QObject, public QQmlParserStatus
+class JsonFluxView : public QObject, public QQmlParserStatus
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
@@ -16,10 +16,10 @@ public:
     Q_PROPERTY(QStringList query READ query WRITE setQuery NOTIFY queryChanged)
     Q_PROPERTY(QVariantMap values READ values NOTIFY valuesChanged)
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
-    Q_PROPERTY(JsonModel* model READ model WRITE setModel NOTIFY modelChanged)
+    Q_PROPERTY(JsonFluxModel* model READ model WRITE setModel NOTIFY modelChanged)
 
-    explicit JsonQuery(QObject *parent = Q_NULLPTR);
-    ~JsonQuery();
+    explicit JsonFluxView(QObject *parent = Q_NULLPTR);
+    ~JsonFluxView();
 
     void classBegin() Q_DECL_OVERRIDE;
     void componentComplete() Q_DECL_OVERRIDE;
@@ -27,8 +27,8 @@ public:
     QString modelName() const;
     void setModelName(QString newModelName);
 
-    JsonModel* model() const;
-    void setModel(JsonModel * newModel);
+    JsonFluxModel* model() const;
+    void setModel(JsonFluxModel * newModel);
 
     QStringList query() const;
     void setQuery(QStringList newQuery);
@@ -39,7 +39,7 @@ public:
     void setEnabled(bool newEnabled);
 
 private slots:
-    void onModelUpdated(JsonModel *model);
+    void onModelUpdated(JsonFluxModel *model);
 private:
     QVariantMap doQuery() const;
 signals:
@@ -52,9 +52,9 @@ signals:
 private:
     QStringList m_query;
     bool m_enabled = true;
-    JsonModel *m_modelObject = Q_NULLPTR;
+    JsonFluxModel *m_modelObject = Q_NULLPTR;
     bool m_initialized = false;
     QVariantMap m_queryValues;
 };
 
-#endif // JSONQUERY_H
+#endif // JSONFLUXVIEW_H

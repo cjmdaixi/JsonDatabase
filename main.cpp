@@ -1,7 +1,7 @@
 #include <QGuiApplication>
 #include <QQmlApplicationEngine>
 #include <QtQml>
-#include "jsondatabase.h"
+#include "jsonflux.h"
 
 int main(int argc, char *argv[])
 {

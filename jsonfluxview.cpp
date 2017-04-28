@@ -1,28 +1,28 @@
-#include "jsonquery.h"
-#include "jsondatabase.h"
-#include "jsonmodel.h"
+#include "jsonfluxview.h"
+#include "jsonflux.h"
+#include "jsonfluxmodel.h"
 #include <QtDebug>
 #include <QRegularExpression>
 #include <QRegularExpressionMatch>
 #include <QJsonValue>
 #include <QVariantMap>
 
-JsonQuery::JsonQuery(QObject *parent)
+JsonFluxView::JsonFluxView(QObject *parent)
     : QObject(parent)
 {
-    connect(database(), &JsonDatabase::updated, this, &JsonQuery::onModelUpdated);
+    connect(flux(), &JsonFlux::updated, this, &JsonFluxView::onModelUpdated);
 }
 
-JsonQuery::~JsonQuery()
+JsonFluxView::~JsonFluxView()
 {
 }
 
-void JsonQuery::classBegin()
+void JsonFluxView::classBegin()
 {
     m_initialized = false;
 }
 
-void JsonQuery::componentComplete()
+void JsonFluxView::componentComplete()
 {
     if(m_enabled && m_modelObject && !m_query.isEmpty()){
         emit enabledChanged();
@@ -33,16 +33,16 @@ void JsonQuery::componentComplete()
     m_initialized = true;
 }
 
-QString JsonQuery::modelName() const
+QString JsonFluxView::modelName() const
 {
     return m_modelObject->name();
 }
 
-void JsonQuery::setModelName(QString newModelName)
+void JsonFluxView::setModelName(QString newModelName)
 {
     if(m_modelObject->name() == newModelName) return;
 
-    auto newModelObj = database()->model(newModelName);
+    auto newModelObj = flux()->model(newModelName);
     if(newModelObj == Q_NULLPTR){
         qWarning()<<"The new model does not exist!";
         return;
@@ -54,12 +54,12 @@ void JsonQuery::setModelName(QString newModelName)
     }
 }
 
-JsonModel* JsonQuery::model() const
+JsonFluxModel* JsonFluxView::model() const
 {
     return m_modelObject;
 }
 
-void JsonQuery::setModel(JsonModel *newModel)
+void JsonFluxView::setModel(JsonFluxModel *newModel)
 {
     if(m_modelObject == newModel) return;
 
@@ -71,12 +71,12 @@ void JsonQuery::setModel(JsonModel *newModel)
     }
 }
 
-QStringList JsonQuery::query() const
+QStringList JsonFluxView::query() const
 {
     return m_query;
 }
 
-void JsonQuery::setQuery(QStringList newQuery)
+void JsonFluxView::setQuery(QStringList newQuery)
 {
     if(m_query == newQuery) return;
 
@@ -88,7 +88,7 @@ void JsonQuery::setQuery(QStringList newQuery)
     }
 }
 
-QVariantMap JsonQuery::values() const
+QVariantMap JsonFluxView::values() const
 {
     QVariantMap results;
 
@@ -100,34 +100,34 @@ QVariantMap JsonQuery::values() const
     return results;
 }
 
-bool JsonQuery::enabled() const
+bool JsonFluxView::enabled() const
 {
     return m_enabled;
 }
 
-void JsonQuery::setEnabled(bool newEnabled)
+void JsonFluxView::setEnabled(bool newEnabled)
 {
     if(m_enabled == newEnabled) return;
 
     m_enabled = newEnabled;
 
     if(m_enabled){
-        connect(database(), &JsonDatabase::updated, this, &JsonQuery::onModelUpdated);
+        connect(flux(), &JsonFlux::updated, this, &JsonFluxView::onModelUpdated);
     }else{
-        disconnect(database(), &JsonDatabase::updated, this, &JsonQuery::onModelUpdated);
+        disconnect(flux(), &JsonFlux::updated, this, &JsonFluxView::onModelUpdated);
     }
     if(m_initialized){
         emit enabledChanged();
     }
 }
 
-void JsonQuery::onModelUpdated(JsonModel *model)
+void JsonFluxView::onModelUpdated(JsonFluxModel *model)
 {
     if(m_modelObject && model == m_modelObject)
         emit valuesChanged();
 }
 
-QVariantMap JsonQuery::doQuery() const
+QVariantMap JsonFluxView::doQuery() const
 {
     QVariantMap results;
     QRegularExpression re("^(?<node>\\w+)(\\[(?<idx>\\d*)\\])?$");

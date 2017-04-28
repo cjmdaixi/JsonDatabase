@@ -1,6 +1,6 @@
 import QtQuick 2.6
 import QtQuick.Window 2.2
-import JsonDatabase 1.0
+import JsonFlux 1.0
 
 Window {
     visible: true
@@ -8,13 +8,13 @@ Window {
     height: 480
     title: qsTr("Hello World")
 
-    JsonModel{
+    JsonFluxModel{
         id: jsonModel
         source: "demo.json"
         name: "mymodel"
     }
 
-    JsonQuery{
+    JsonFluxQuery{
         id: jsonQuery
         query: ["widget.debug", "widget.image.src"]
         model: jsonModel

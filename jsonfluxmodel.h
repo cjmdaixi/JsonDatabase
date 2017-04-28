@@ -1,5 +1,5 @@
-#ifndef JSONMODEL_H
-#define JSONMODEL_H
+#ifndef JSONFLUXMODEL_H
+#define JSONFLUXMODEL_H
 
 #include <QObject>
 #include <QJsonDocument>
@@ -8,7 +8,7 @@
 #include <QJsonValue>
 #include <QVariantMap>
 
-class JsonModel : public QObject
+class JsonFluxModel : public QObject
 {
     Q_OBJECT
 public:
@@ -16,8 +16,8 @@ public:
     Q_PROPERTY(QString source READ source WRITE setSource NOTIFY sourceChanged)
     Q_PROPERTY(QVariantMap data READ data WRITE setData NOTIFY updated)
 
-    explicit JsonModel(QObject *parent = 0);
-    ~JsonModel();
+    explicit JsonFluxModel(QObject *parent = 0);
+    ~JsonFluxModel();
 
     QString name() const;
     void setName(QString newName);
@@ -40,4 +40,4 @@ private:
     bool m_initialized = false;
 };
 
-#endif // JSONMODEL_H
+#endif // JSONFLUXMODEL_H
