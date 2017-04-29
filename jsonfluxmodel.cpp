@@ -1,6 +1,9 @@
 #include "jsonfluxmodel.h"
 #include "jsonflux.h"
 #include <QtDebug>
+#include <fstream>
+#include "json.h"
+using namespace nlohmann;
 
 JsonFluxModel::JsonFluxModel(QObject *parent)
     : QObject(parent)
@@ -37,24 +40,14 @@ void JsonFluxModel::setSource(QString newSource)
 {
     if(m_source == newSource) return;
 
-    QFile infile(newSource);
-    if(!infile.open(QIODevice::ReadOnly)){
+    std::ifstream inf(newSource.toStdString());
+
+    if(!inf.is_open()){
         qCritical()<<"Cannot open the json file"<<newSource;
         return;
     }
 
-    auto jsonDoc = QJsonDocument::fromJson(infile.readAll());
-    if(jsonDoc.isNull()){
-        qCritical()<<"The file is not a valid json file!";
-        return;
-    }
-    infile.close();
-
-    m_jsonObject = jsonDoc.object();
-    if(m_jsonObject.isEmpty()){
-        qCritical()<<"The file is not a valid json file!";
-        return;
-    }
+    inf >> m_json;
 
     m_source = newSource;
 
@@ -64,7 +57,10 @@ void JsonFluxModel::setSource(QString newSource)
 
 QVariantMap JsonFluxModel::data() const
 {
-    return m_jsonObject.toVariantMap();
+    auto str = m_json.dump();
+
+    auto jsonDoc = QJsonDocument::fromJson(QByteArray::fromStdString(str));
+    return jsonDoc.object().toVariantMap();
 }
 
 void JsonFluxModel::setData(QVariantMap newData)
@@ -74,11 +70,14 @@ void JsonFluxModel::setData(QVariantMap newData)
         qCritical()<<"The data is not a valid json!";
         return;
     }
-    m_jsonObject = newJsonObj;
+    QJsonDocument jsonDoc;
+    jsonDoc.setObject(newJsonObj);
+    auto jsonStr = jsonDoc.toJson();
+    m_json = json::parse(jsonStr.data());
     emit updated();
 }
 
-QJsonObject JsonFluxModel::jsonObject() const
+json* JsonFluxModel::jsonObject()
 {
-    return m_jsonObject;
+    return &m_json;
 }

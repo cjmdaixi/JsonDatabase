@@ -4,6 +4,8 @@
 #include <QObject>
 #include <QVariantMap>
 #include <QQmlParserStatus>
+#include "json.h"
+using namespace nlohmann;
 
 class JsonFluxModel;
 

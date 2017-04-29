@@ -2,11 +2,9 @@
 #define JSONFLUXMODEL_H
 
 #include <QObject>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QJsonValue>
 #include <QVariantMap>
+#include "json.h"
+using namespace nlohmann;
 
 class JsonFluxModel : public QObject
 {
@@ -28,7 +26,9 @@ public:
     QVariantMap data() const;
     void setData(QVariantMap newData);
 
-    QJsonObject jsonObject() const;
+    json* jsonObject();
+
+    //QVariant
 signals:
     void updated();
     void nameChanged();
@@ -36,7 +36,7 @@ signals:
 public slots:
 private:
     QString m_name = "", m_source;
-    QJsonObject m_jsonObject;
+    json m_json;
     bool m_initialized = false;
 };
 

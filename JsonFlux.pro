@@ -6,8 +6,7 @@ CONFIG += c++11
 SOURCES += main.cpp \
     jsonflux.cpp \
     jsonfluxmodel.cpp \
-    jsonfluxview.cpp \
-    jsonfluxmodifier.cpp
+    jsonfluxview.cpp
 
 RESOURCES += qml.qrc
 
@@ -34,7 +33,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 HEADERS += \
+    json.h \
     jsonflux.h \
     jsonfluxmodel.h \
-    jsonfluxview.h \
-    jsonfluxmodifier.h
+    jsonfluxview.h

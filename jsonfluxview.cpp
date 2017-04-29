@@ -130,47 +130,30 @@ void JsonFluxView::onModelUpdated(JsonFluxModel *model)
 QVariantMap JsonFluxView::doQuery() const
 {
     QVariantMap results;
-    QRegularExpression re("^(?<node>\\w+)(\\[(?<idx>\\d*)\\])?$");
+    auto jsonObject = m_modelObject->jsonObject();
     for(int i = 0; i != m_query.size(); ++i){
         auto &oneQuery = m_query[i];
-        auto nodeList = oneQuery.split('.');
-        QJsonValue jsonVal = m_modelObject->jsonObject();
         auto foundNode = true;
-        for(auto &node : nodeList){
-            if(!jsonVal.isObject()){
-                qDebug()<<"the json value is not an object!";
-                foundNode = false;
-                break;
-            }
-            auto jsonObj = jsonVal.toObject();
-
-            auto match = re.match(node);
-            if(!match.hasMatch()){
-                qDebug()<<"invalid node name!";
-                foundNode = false;
-                break;
-            }
-            auto nodeName = match.captured("node");
-            auto nodeIdx = match.captured("idx");
-            if(!jsonObj.contains(nodeName)){
-                qDebug()<<"no such node"<<nodeName;
-                foundNode = false;
-                break;
-            }
-            jsonVal = jsonObj[nodeName];
-            if(nodeIdx != ""){
-                if(!jsonVal.isArray()){
-                    qDebug()<<"the node is not an array!";
-                    foundNode = false;
-                    break;
-                }
-                auto idx = nodeIdx.toInt();
-                jsonVal = jsonVal.toArray()[idx];
-            }
-        }
+        json::json_pointer pt(oneQuery.toStdString());
         if(foundNode){
-            results[oneQuery] = jsonVal.toVariant();
-            results[QString("@%1").arg(i)] = jsonVal.toVariant();
+            auto jsonVal = (*jsonObject)[pt];
+            QVariant variantVal;
+            std::string strVal;
+            switch(jsonVal.type()){
+            case detail::value_t::array:
+                break;
+            case detail::value_t::boolean:
+                break;
+            case detail::value_t::string:
+                strVal = jsonVal;
+                variantVal.fromValue(QString::fromStdString(strVal));
+
+                break;
+            default:
+                break;
+            }
+            results[oneQuery] = variantVal;
+            //results[QString("@%1").arg(i)] = (*jsonObject)[pt];
         }
     }
     return results;
