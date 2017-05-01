@@ -8,6 +8,8 @@
 #include <QtQml>
 #include <QMap>
 #include <QtDebug>
+#include "json.h"
+using namespace nlohmann;
 
 class JsonFluxModel;
 class JsonFluxView;
@@ -22,10 +24,13 @@ public:
     bool registerModel(QString modelName, JsonFluxModel *model);
     bool unregisterModel(QString modelName, bool deleteModel = false);
 
+    static QVariantMap toVariantMap(json &jo);
+    static QVariant toVariant(json::value_type &jsonValue);
 signals:
     void updated(JsonFluxModel *model);
 public slots:
     void onModelUpdated();
+
 private:
     QMap<QString, JsonFluxModel*> m_models;
 };

@@ -65,3 +65,38 @@ void JsonFlux::onModelUpdated()
     auto model = qobject_cast<JsonFluxModel*>(sender());
     emit updated(model);
 }
+
+QVariantMap JsonFlux::toVariantMap(json &jo)
+{
+    QVariantMap vm;
+    for (auto it = jo.begin(); it != jo.end(); ++it) {
+        auto key = QString::fromStdString(it.key());
+        vm[key] = toVariant(it.value());
+    }
+    return vm;
+}
+
+QVariant JsonFlux::toVariant(json::value_type &jsonValue){
+    QVariant v;
+    auto valueType = jsonValue.type();
+    if(valueType  == json::value_t::boolean){
+        bool boolVal = jsonValue;
+        v = boolVal;
+    }
+    else if(valueType == json::value_t::string){
+        std::string strVal = jsonValue;
+        v = QString::fromStdString(strVal);
+    }
+    else if(valueType == json::value_t::number_integer){
+        int intVal = jsonValue;
+        v = intVal;
+    }
+    else if(valueType == detail::value_t::array){
+        QVariantList vl;
+        for(auto it = jsonValue.begin(); it != jsonValue.end(); ++it){
+            vl.push_back(toVariant(it.value()));
+        }
+        v = vl;
+    }
+    return v;
+}

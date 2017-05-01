@@ -133,28 +133,12 @@ QVariantMap JsonFluxView::doQuery() const
     auto jsonObject = m_modelObject->jsonObject();
     for(int i = 0; i != m_query.size(); ++i){
         auto &oneQuery = m_query[i];
-        auto foundNode = true;
-        json::json_pointer pt(oneQuery.toStdString());
-        if(foundNode){
-            auto jsonVal = (*jsonObject)[pt];
-            QVariant variantVal;
-            std::string strVal;
-            switch(jsonVal.type()){
-            case detail::value_t::array:
-                break;
-            case detail::value_t::boolean:
-                break;
-            case detail::value_t::string:
-                strVal = jsonVal;
-                variantVal.fromValue(QString::fromStdString(strVal));
-
-                break;
-            default:
-                break;
-            }
-            results[oneQuery] = variantVal;
-            //results[QString("@%1").arg(i)] = (*jsonObject)[pt];
-        }
+        //auto foundNode = true;
+        json::json_pointer ptr(oneQuery.toStdString());
+        auto jsonVal = (*jsonObject)[ptr];
+        auto v = JsonFlux::toVariant(jsonVal);
+        results[oneQuery] = v;
+        results[QString("@%1").arg(i)] = v;
     }
     return results;
 }

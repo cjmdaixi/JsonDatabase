@@ -17,7 +17,7 @@ Window {
 
     JsonFluxView{
         id: jsonQuery
-        query: ["widget.debug", "widget.image.src"]
+        query: ["/widget/debug", "/widget/image/src"]
         model: jsonModel
         onValuesChanged: {
             console.log(values["@0"], values["@1"]);
