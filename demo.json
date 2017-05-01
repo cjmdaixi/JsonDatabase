@@ -1,5 +1,5 @@
 {"widget": {
-    "debug": "on",
+    "debug": ["on","off", "mid"],
     "window": {
         "title": "Sample Konfabulator Widget",
         "name": "main_window",

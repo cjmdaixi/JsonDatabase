@@ -97,6 +97,9 @@ QVariant JsonFlux::toVariant(json::value_type &jsonValue){
             vl.push_back(toVariant(it.value()));
         }
         v = vl;
+    }else if(valueType == detail::value_t::object){
+        QVariantMap vm = toVariantMap(jsonValue);
+        v = vm;
     }
     return v;
 }
