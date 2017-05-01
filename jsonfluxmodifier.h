@@ -3,6 +3,8 @@
 
 #include <QObject>
 #include <QVariant>
+#include "json.h"
+using namespace nlohmann;
 
 class JsonFluxModel;
 

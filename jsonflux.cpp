@@ -23,7 +23,7 @@ static void preCreateJsonDatabase()
     qmlRegisterSingletonType<JsonFlux>("JsonFlux", 1, 0, "JsonFlux", json_flux_singletontype_provider);
     qmlRegisterType<JsonFluxModel>("JsonFlux", 1, 0, "JsonFluxModel");
     qmlRegisterType<JsonFluxView>("JsonFlux", 1, 0, "JsonFluxView");
-    //qmlRegisterType<JsonFluxModifier>("JsonFlux", 1, 0, "JsonFluxModifier");
+    qmlRegisterType<JsonFluxModifier>("JsonFlux", 1, 0, "JsonFluxModifier");
     qDebug()<<"register json flux types";
 }
 
@@ -80,16 +80,13 @@ QVariant JsonFlux::toVariant(json::value_type &jsonValue){
     QVariant v;
     auto valueType = jsonValue.type();
     if(valueType  == json::value_t::boolean){
-        bool boolVal = jsonValue;
-        v = boolVal;
+        v = jsonValue.get<bool>();
     }
     else if(valueType == json::value_t::string){
-        std::string strVal = jsonValue;
-        v = QString::fromStdString(strVal);
+        v = QString::fromStdString(jsonValue.get<std::string>());
     }
     else if(valueType == json::value_t::number_integer){
-        int intVal = jsonValue;
-        v = intVal;
+        v = jsonValue.get<int>();
     }
     else if(valueType == detail::value_t::array){
         QVariantList vl;
@@ -97,7 +94,8 @@ QVariant JsonFlux::toVariant(json::value_type &jsonValue){
             vl.push_back(toVariant(it.value()));
         }
         v = vl;
-    }else if(valueType == detail::value_t::object){
+    }
+    else if(valueType == detail::value_t::object){
         QVariantMap vm = toVariantMap(jsonValue);
         v = vm;
     }

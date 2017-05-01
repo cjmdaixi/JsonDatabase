@@ -6,7 +6,8 @@ CONFIG += c++11
 SOURCES += main.cpp \
     jsonflux.cpp \
     jsonfluxmodel.cpp \
-    jsonfluxview.cpp
+    jsonfluxview.cpp \
+    jsonfluxmodifier.cpp
 
 RESOURCES += qml.qrc
 
@@ -36,4 +37,5 @@ HEADERS += \
     json.h \
     jsonflux.h \
     jsonfluxmodel.h \
-    jsonfluxview.h
+    jsonfluxview.h \
+    jsonfluxmodifier.h

@@ -26,6 +26,10 @@ void JsonFluxModifier::setModel(JsonFluxModel *newModel)
 
 bool JsonFluxModifier::modify(QString jsonPath, QVariant newValue)
 {
+    json::json_pointer ptr(jsonPath.toStdString());
+    //try{
+    //    (*jsonObject)[ptr]
+   // }
     return true;
 }
 
