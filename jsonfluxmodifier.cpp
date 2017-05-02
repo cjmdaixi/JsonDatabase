@@ -92,3 +92,8 @@ bool JsonFluxModifier::modify(QString jsonPath, QVariantMap newObject)
 
     return true;
 }
+
+bool JsonFluxModifier::fileSync() const
+{
+    return m_fileSync;
+}

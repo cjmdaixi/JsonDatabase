@@ -21,8 +21,14 @@ Window {
         query: ["/widget/debug", "/widget/image"]
         //model: jsonModel
         modelName: "mymodel"
+        property var myVar
+        onMyVarChanged: {
+            console.log("new myVar:", myVar);
+        }
+
         onValuesChanged: {
-            console.log(values["@0"], values["@1"]);
+           // console.log(values["@0"], values["@1"]);
+            myVar = values["@0"];
         }
     }
 
