@@ -26,6 +26,25 @@ void JsonFluxModifier::setModel(JsonFluxModel *newModel)
     emit modelChanged();
 }
 
+
+QString JsonFluxModifier::modelName() const
+{
+    return m_modelObject->name();
+}
+
+void JsonFluxModifier::setModelName(QString newModelName)
+{
+    if(m_modelObject && (m_modelObject->name() == newModelName))
+        return;
+
+    auto newModelObj = flux()->model(newModelName);
+    if(newModelObj == Q_NULLPTR){
+        qWarning()<<"The new model does not exist!";
+        return;
+    }
+    setModel(newModelObj);
+}
+
 bool JsonFluxModifier::modify(QString jsonPath, QVariant newValue)
 {
     json::json_pointer ptr(jsonPath.toStdString());

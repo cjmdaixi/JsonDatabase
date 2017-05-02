@@ -28,7 +28,8 @@ Window {
 
     JsonFluxModifier{
         id: jsonModifier
-        model: jsonModel
+        //model: jsonModel
+        modelName: "mymodel"
     }
 
     Button{
@@ -42,8 +43,8 @@ Window {
             var obj = {};
             obj.a = "jimmy";
             obj.b = "lucy";
-            //jsonModifier.modify("/widget/debug", /*false*/["Aa", "Bb", "Cc", "Dd"]/*[false, true, false]*/);
-            jsonModifier.modify("/widget/debug", obj);
+            jsonModifier.modify("/widget/debug", /*false*/["Aa", "Bb", "Cc", "Dd"]/*[false, true, false]*/);
+            //jsonModifier.modify("/widget/debug", obj);
         }
     }
 }
