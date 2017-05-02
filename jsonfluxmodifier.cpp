@@ -1,3 +1,5 @@
+#include "jsonflux.h"
+#include "jsonfluxmodel.h"
 #include "jsonfluxmodifier.h"
 
 JsonFluxModifier::JsonFluxModifier(QObject *parent)
@@ -27,9 +29,16 @@ void JsonFluxModifier::setModel(JsonFluxModel *newModel)
 bool JsonFluxModifier::modify(QString jsonPath, QVariant newValue)
 {
     json::json_pointer ptr(jsonPath.toStdString());
-    //try{
-    //    (*jsonObject)[ptr]
-   // }
+    auto jsonObject = m_modelObject->jsonObject();
+    try{
+        (*jsonObject)[ptr] = JsonFlux::toJsonValue(newValue);
+    }
+    catch(std::out_of_range&){
+        qCritical()<<"The jsonpath is invalid!";
+        return false;
+    }
+    QMetaObject::invokeMethod(m_modelObject, "updated", Qt::AutoConnection);
+
     return true;
 }
 

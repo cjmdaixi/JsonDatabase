@@ -25,6 +25,7 @@ void JsonFluxView::classBegin()
 void JsonFluxView::componentComplete()
 {
     if(m_enabled && m_modelObject && !m_query.isEmpty()){
+        m_queryValues = doQuery();
         emit enabledChanged();
         emit modelChanged();
         emit queryChanged();
@@ -90,14 +91,7 @@ void JsonFluxView::setQuery(QStringList newQuery)
 
 QVariantMap JsonFluxView::values() const
 {
-    QVariantMap results;
-
-    if(m_modelObject == Q_NULLPTR)
-        return results;
-
-    results = doQuery();
-
-    return results;
+    return m_queryValues;
 }
 
 bool JsonFluxView::enabled() const
@@ -123,8 +117,13 @@ void JsonFluxView::setEnabled(bool newEnabled)
 
 void JsonFluxView::onModelUpdated(JsonFluxModel *model)
 {
-    if(m_modelObject && model == m_modelObject)
-        emit valuesChanged();
+    if(m_modelObject && model == m_modelObject){
+        auto newValues = doQuery();
+        if(newValues != m_queryValues){
+            m_queryValues = newValues;
+            emit valuesChanged();
+        }
+    }
 }
 
 QVariantMap JsonFluxView::doQuery() const

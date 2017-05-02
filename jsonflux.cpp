@@ -101,3 +101,47 @@ QVariant JsonFlux::toVariant(json::value_type &jsonValue){
     }
     return v;
 }
+
+json::value_type JsonFlux::toJsonValue(QVariant variant)
+{
+    json::value_type jsonValue;
+
+    switch (variant.type()) {
+    case QMetaType::Bool:
+        jsonValue = variant.value<bool>();
+        break;
+    case QMetaType::QString:
+        jsonValue = variant.value<QString>().toStdString();
+        break;
+    case QMetaType::Int:
+        jsonValue = variant.value<int>();
+        break;
+    case QMetaType::QVariantList:
+        jsonValue = toJsonArray(variant.value<QVariantList>());
+        break;
+    case QMetaType::QVariantMap:
+        jsonValue = toJsonObject(variant.value<QVariantMap>());
+        break;
+    default:
+        break;
+    }
+    return jsonValue;
+}
+
+json::value_type JsonFlux::toJsonArray(QVariantList vl)
+{
+    json::value_type jsonVal;
+    for (auto v : vl){
+        jsonVal.push_back(toJsonValue(v));
+    }
+    return jsonVal;
+}
+
+json::value_type JsonFlux::toJsonObject(QVariantMap vm)
+{
+    json::value_type jsonVal;
+    for (auto it = vm.begin(); it != vm.end(); ++it){
+        jsonVal[it.key().toStdString()] = toJsonValue(it.value());
+    }
+    return jsonVal;
+}
