@@ -41,7 +41,8 @@ QString JsonFluxView::modelName() const
 
 void JsonFluxView::setModelName(QString newModelName)
 {
-    if(m_modelObject->name() == newModelName) return;
+    if(m_modelObject && (m_modelObject->name() == newModelName))
+        return;
 
     auto newModelObj = flux()->model(newModelName);
     if(newModelObj == Q_NULLPTR){

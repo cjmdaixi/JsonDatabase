@@ -19,8 +19,8 @@ Window {
     JsonFluxView{
         id: jsonQuery
         query: ["/widget/debug", "/widget/image"]
-        model: jsonModel
-        //modelName: "mymodel"
+        //model: jsonModel
+        modelName: "mymodel"
         onValuesChanged: {
             console.log(values["@0"], values["@1"]);
         }
@@ -39,7 +39,11 @@ Window {
         text: "Click!"
 
         onClicked:{
-            jsonModifier.modify("/widget/debug", [false, true, false]);
+            var obj = {};
+            obj.a = "jimmy";
+            obj.b = "lucy";
+            //jsonModifier.modify("/widget/debug", /*false*/["Aa", "Bb", "Cc", "Dd"]/*[false, true, false]*/);
+            jsonModifier.modify("/widget/debug", obj);
         }
     }
 }

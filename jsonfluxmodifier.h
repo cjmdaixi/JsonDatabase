@@ -20,6 +20,8 @@ public:
     void setModel(JsonFluxModel *newModel);
 
     Q_INVOKABLE bool modify(QString jsonPath, QVariant newValue);
+    Q_INVOKABLE bool modify(QString jsonPath, QVariantList newValues);
+    Q_INVOKABLE bool modify(QString jsonPath, QVariantMap newObject);
 signals:
     void modelChanged();
 private:
