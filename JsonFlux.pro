@@ -7,7 +7,8 @@ SOURCES += main.cpp \
     jsonflux.cpp \
     jsonfluxmodel.cpp \
     jsonfluxview.cpp \
-    jsonfluxmodifier.cpp
+    jsonfluxmodifier.cpp \
+    jsonfluxconnector.cpp
 
 RESOURCES += qml.qrc
 
@@ -38,4 +39,5 @@ HEADERS += \
     jsonflux.h \
     jsonfluxmodel.h \
     jsonfluxview.h \
-    jsonfluxmodifier.h
+    jsonfluxmodifier.h \
+    jsonfluxconnector.h

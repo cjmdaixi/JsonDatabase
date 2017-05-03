@@ -62,3 +62,35 @@ bool JsonFluxModifier::modify(QString jsonPath, QVariantMap newObject)
     if(m_modelObject == Q_NULLPTR) return false;
     return m_modelObject->modify(jsonPath, newObject);
 }
+
+
+bool JsonFluxModifier::modify(QVariant newValue)
+{
+    if(m_modelObject == Q_NULLPTR) return false;
+    return m_modelObject->modify(m_path, newValue);
+}
+
+bool JsonFluxModifier::modify(QVariantList newValues)
+{
+    if(m_modelObject == Q_NULLPTR) return false;
+    return m_modelObject->modify(m_path, newValues);
+}
+
+bool JsonFluxModifier::modify(QVariantMap newObject)
+{
+    if(m_modelObject == Q_NULLPTR) return false;
+    return m_modelObject->modify(m_path, newObject);
+}
+
+QString JsonFluxModifier::path() const
+{
+    return m_path;
+}
+
+void JsonFluxModifier::setPath(QString newPath)
+{
+    if(m_path == newPath) return;
+
+    m_path = newPath;
+    emit pathChanged();
+}
