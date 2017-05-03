@@ -14,6 +14,7 @@ Window {
         id: jsonModel
         source: "demo.json"
         name: "mymodel"
+        fileSync: true
     }
 
     JsonFluxView{
