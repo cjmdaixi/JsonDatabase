@@ -17,41 +17,64 @@ Window {
         fileSync: true
     }
 
-    JsonFluxView{
-        id: jsonQuery
-        query: ["/widget/debug", "/widget/image"]
-        //model: jsonModel
-        modelName: "mymodel"
-        property var myVar
-        onMyVarChanged: {
-            console.log("new myVar:", myVar);
-        }
+//    JsonFluxView{
+//        id: jsonQuery
+//        query: ["/widget/debug", "/widget/image"]
+//        //model: jsonModel
+//        modelName: "mymodel"
+//        property var myVar
+//        onMyVarChanged: {
+//            console.log("new myVar:", myVar);
+//        }
 
-        onValuesChanged: {
-           // console.log(values["@0"], values["@1"]);
-            myVar = values["@0"];
+//        onValuesChanged: {
+//           // console.log(values["@0"], values["@1"]);
+//            myVar = values["@0"];
+//        }
+//    }
+
+//    JsonFluxModifier{
+//        id: jsonModifier
+//        //model: jsonModel
+//        modelName: "mymodel"
+//    }
+
+//    Button{
+//        id: btn
+//        width: 100
+//        height: 50
+//        anchors.centerIn: parent
+//        text: "Click!"
+
+//        onClicked:{
+//            var obj = {};
+//            obj.a = "jimmy";
+//            obj.b = "lucy";
+//            jsonModifier.modify("/widget/debug", /*false*/["Aa", "Bb", "Cc", "Dd"]/*[false, true, false]*/);
+//            //jsonModifier.modify("/widget/debug", obj);
+//        }
+//    }
+    JsonFluxConnector{
+        id: connector
+        model: jsonModel
+        connections: {
+            [
+                {"control": textField1, "type": JsonFluxConnector.TextField, "query": "/widget/debug/0"},
+                {"control": textField2, "type": JsonFluxConnector.TextField, "query": "/widget/debug/0"}
+            ]
         }
     }
 
-    JsonFluxModifier{
-        id: jsonModifier
-        //model: jsonModel
-        modelName: "mymodel"
-    }
-
-    Button{
-        id: btn
-        width: 100
+    TextField{
+        id: textField1
+        width: 120
         height: 50
-        anchors.centerIn: parent
-        text: "Click!"
-
-        onClicked:{
-            var obj = {};
-            obj.a = "jimmy";
-            obj.b = "lucy";
-            jsonModifier.modify("/widget/debug", /*false*/["Aa", "Bb", "Cc", "Dd"]/*[false, true, false]*/);
-            //jsonModifier.modify("/widget/debug", obj);
-        }
+        anchors{centerIn: parent; horizontalCenterOffset: -100}
+    }
+    TextField{
+        id: textField2
+        width: 120
+        height: 50
+        anchors{centerIn: parent; horizontalCenterOffset: 100}
     }
 }

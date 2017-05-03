@@ -6,14 +6,14 @@
 #include <QMetaObject>
 #include <QMetaMethod>
 #include <QMetaProperty>
-
-static QString SpinBox = QStringLiteral("SpinBox");
-static QString TextField = QStringLiteral("TextField");
+#include <QQmlEngine>
+#include <QQmlContext>
 
 JsonFluxConnector::JsonFluxConnector(QObject *parent)
     : QObject(parent)
 {
-
+    m_fluxView = new JsonFluxView(this);
+    m_fluxModifier = new JsonFluxModifier(this);
 }
 
 
@@ -32,6 +32,9 @@ void JsonFluxConnector::componentComplete()
             doConnection();
             emit connectionsChanged();
         }
+
+        QObject::connect(m_fluxView, &JsonFluxView::valuesChanged, this, &JsonFluxConnector::onValuesChanged);
+        emit enabledChanged();
     }
     m_initialized = true;
 }
@@ -50,6 +53,14 @@ void JsonFluxConnector::setEnabled(bool newEnabled)
     if(m_initialized)
     {
         emit enabledChanged();
+        if(m_enabled)
+        {
+            QObject::connect(m_fluxView, &JsonFluxView::valuesChanged, this, &JsonFluxConnector::onValuesChanged);
+        }
+        else
+        {
+            QObject::disconnect(m_fluxView, &JsonFluxView::valuesChanged, this, &JsonFluxConnector::onValuesChanged);
+        }
     }
 }
 
@@ -107,6 +118,7 @@ void JsonFluxConnector::setConnections(QVariantList newConnections)
 
     if(m_initialized)
     {
+        doDisconnection();
         doConnection();
         emit connectionsChanged();
     }
@@ -114,65 +126,102 @@ void JsonFluxConnector::setConnections(QVariantList newConnections)
 
 void JsonFluxConnector::doConnection()
 {
+    QStringList viewQuery;
     for(auto cnVar : m_connections)
     {
         auto connection = cnVar.value<QVariantMap>();
         auto control = connection["control"].value<QObject*>();
         auto query = connection["query"].value<QString>();
+        auto controlType = connection["type"].value<int>();
 
-        auto mo = control->metaObject();
-        auto cn = QString(mo->className());
-        if(cn == TextField)
+        Connection conn (control, controlType, query);
+        m_connectionDetails.push_back(conn);
+
+        viewQuery << query;
+
+        if(controlType == TextField)
         {
-            auto view = new JsonFluxView(this);
-            view->setModel(m_modelObject);
-            view->setQuery(QStringList(query));
-            QObject::connect(view, &JsonFluxView::valuesChanged, this, [this, control, view](){
-                auto values = view->values();
-                control->setProperty("text", values[0]);
-            });
-            m_fluxViews[control] = view;
-
-            auto modifier = new JsonFluxModifier(this);
-            modifier->setModel(m_modelObject);
-            modifier->setPath(query);
-            QObject::connect(control, SIGNAL(editingFinished()), this, SLOT(onSpinBoxEditingFinished()));
-            m_fluxModifiers[control] = modifier;
+            QObject::connect(control, SIGNAL(editingFinished()), this, SLOT(onTextFieldEditingFinished()));
         }
-        else if(cn == SpinBox)
+        else if(controlType == SpinBox)
         {
 
+        }
+    }
+    m_fluxView->setQuery(viewQuery);
+}
+
+void JsonFluxConnector::onValuesChanged()
+{
+    auto values = m_fluxView->values();
+    for (auto it = values.begin(); it != values.end(); ++it)
+    {
+        auto query = it.key();
+        if(query[0] != '@')
+        {
+            auto conns = searchQuery(query);
+            for(auto &conn : conns)
+            {
+                switch (conn.controlType) {
+                case TextField:
+                    conn.control->setProperty("text", it.value());
+                    break;
+                default:
+                    break;
+                }
+            }
         }
     }
 }
 
+QList<Connection> JsonFluxConnector::searchQuery(QString query)
+{
+    QList<Connection> list;
+    for(auto &conn : m_connectionDetails)
+    {
+        if(conn.query == query)
+        {
+            list.append(conn);
+        }
+    }
+    return list;
+}
+
+Connection JsonFluxConnector::searchControl(QObject *control)
+{
+    for(auto &conn : m_connectionDetails)
+    {
+        if(conn.control == control)
+            return conn;
+    }
+    return Connection();
+}
+
 void JsonFluxConnector::doDisconnection()
 {
-    for(auto cnVar : m_connections)
+    for(auto conn : m_connectionDetails)
     {
-        auto connection = cnVar.value<QVariantMap>();
-        auto control = connection["control"].value<QObject*>();
-        auto mo = control->metaObject();
-        auto cn = QString(mo->className());
-        if(cn == TextField)
+        if(conn.controlType == TextField)
         {
             // disconnect
             //QObject::disconnect(control, );
         }
-        else if(cn == SpinBox)
+        else if(conn.controlType == SpinBox)
         {
 
         }
 
     }
+    m_connectionDetails.clear();
 }
 
 void JsonFluxConnector::onTextFieldEditingFinished()
 {
     auto textFieldCtrl = sender();
-    auto modifier = m_fluxModifiers[textFieldCtrl];
+    auto conn = searchControl(textFieldCtrl);
     auto newText = textFieldCtrl->property("text").value<QString>();
-    if(!modifier->modify(newText))
+    m_fluxModifier->setPath(conn.query);
+    if(!m_fluxModifier->modify(newText))
     {
         qCritical()<<"Cannot modify control"<<textFieldCtrl->objectName();
     }
