@@ -25,6 +25,7 @@ public:
     bool unregisterModel(QString modelName, bool deleteModel = false);
 
     static QVariantMap toVariantMap(json &jo);
+    static QVariantList toVariantList(json::value_type &jsonArray);
     static QVariant toVariant(json::value_type &jsonValue);
     static json::value_type toJsonValue(QVariant variant);
     static json::value_type toJsonObject(QVariantMap vm);

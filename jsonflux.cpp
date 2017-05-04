@@ -71,41 +71,50 @@ void JsonFlux::onModelUpdated()
 QVariantMap JsonFlux::toVariantMap(json &jo)
 {
     QVariantMap vm;
-    for (auto it = jo.begin(); it != jo.end(); ++it) {
+    for (auto it = jo.begin(); it != jo.end(); ++it)
+    {
         auto key = QString::fromStdString(it.key());
         vm[key] = toVariant(it.value());
     }
     return vm;
 }
 
+QVariantList JsonFlux::toVariantList(json::value_type &jsonArray)
+{
+    QVariantList vl;
+    for(auto it = jsonArray.begin(); it != jsonArray.end(); ++it){
+        vl.push_back(toVariant(it.value()));
+    }
+    return vl;
+}
+
 QVariant JsonFlux::toVariant(json::value_type &jsonValue){
     QVariant v;
     auto valueType = jsonValue.type();
-    if(valueType  == json::value_t::boolean){
+    switch (valueType) {
+    case json::value_t::boolean:
         v = jsonValue.get<bool>();
-    }
-    else if(valueType == json::value_t::string){
+        break;
+    case json::value_t::string:
         v = QString::fromStdString(jsonValue.get<std::string>());
-    }
-    else if(valueType == json::value_t::number_integer){
+        break;
+    case json::value_t::number_integer:
         v = jsonValue.get<int>();
-    }
-    else if(valueType == json::value_t::number_unsigned){
+        break;
+    case json::value_t::number_unsigned:
         v = jsonValue.get<quint32>();
-    }
-    else if(valueType == json::value_t::number_float){
+        break;
+    case json::value_t::number_float:
         v = jsonValue.get<qreal>();
-    }
-    else if(valueType == detail::value_t::array){
-        QVariantList vl;
-        for(auto it = jsonValue.begin(); it != jsonValue.end(); ++it){
-            vl.push_back(toVariant(it.value()));
-        }
-        v = vl;
-    }
-    else if(valueType == detail::value_t::object){
-        QVariantMap vm = toVariantMap(jsonValue);
-        v = vm;
+        break;
+    case detail::value_t::array:
+        v = toVariantList(jsonValue);
+        break;
+    case detail::value_t::object:
+        v = toVariantMap(jsonValue);
+        break;
+    default:
+        break;
     }
     return v;
 }

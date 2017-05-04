@@ -167,20 +167,18 @@ void JsonFluxConnector::onValuesChanged()
             auto conns = searchQuery(query);
             for(auto &conn : conns)
             {
+                conn.control->blockSignals(true);
                 switch (conn.controlType) {
                 case TextField:
-                    conn.control->blockSignals(true);
                     conn.control->setProperty("text", it.value());
-                    conn.control->blockSignals(false);
                     break;
                 case SpinBox:
-                    conn.control->blockSignals(true);
                     conn.control->setProperty("value", it.value());
-                    conn.control->blockSignals(false);
                     break;
                 default:
                     break;
                 }
+                conn.control->blockSignals(false);
             }
         }
     }
@@ -216,11 +214,11 @@ void JsonFluxConnector::doDisconnection()
         if(conn.controlType == TextField)
         {
             // disconnect
-            //QObject::disconnect(control, );
+            QObject::disconnect(conn.control, SIGNAL(textChanged()), this, SLOT(onTextFieldTextChanged()));
         }
         else if(conn.controlType == SpinBox)
         {
-
+            QObject::disconnect(conn.control, SIGNAL(valueChanged()), this, SLOT(onSpinBoxValueChanged()));
         }
 
     }
@@ -243,10 +241,23 @@ void JsonFluxConnector::onSpinBoxValueChanged()
 {
     auto spinBoxCtrl = sender();
     auto conn = searchControl(spinBoxCtrl);
-    auto newValue = spinBoxCtrl->property("value").value<qreal>();
     m_fluxModifier->setPath(conn.query);
-    if(!m_fluxModifier->modify(newValue))
+    auto newValue = spinBoxCtrl->property("value").value<qreal>();
+    auto decimals = spinBoxCtrl->property("decimals").value<int>();
+    if(decimals > 0)
     {
-        qCritical()<<"Cannot modify control"<<spinBoxCtrl->objectName();
+        if(!m_fluxModifier->modify(newValue))
+        {
+            qCritical()<<"Cannot modify control"<<spinBoxCtrl->objectName();
+        }
     }
+    else
+    {
+        auto intValue = int(newValue);
+        if(!m_fluxModifier->modify(intValue))
+        {
+            qCritical()<<"Cannot modify control"<<spinBoxCtrl->objectName();
+        }
+    }
+
 }
