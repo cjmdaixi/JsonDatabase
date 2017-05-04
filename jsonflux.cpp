@@ -82,7 +82,8 @@ QVariantMap JsonFlux::toVariantMap(json &jo)
 QVariantList JsonFlux::toVariantList(json::value_type &jsonArray)
 {
     QVariantList vl;
-    for(auto it = jsonArray.begin(); it != jsonArray.end(); ++it){
+    for(auto it = jsonArray.begin(); it != jsonArray.end(); ++it)
+    {
         vl.push_back(toVariant(it.value()));
     }
     return vl;
@@ -91,7 +92,8 @@ QVariantList JsonFlux::toVariantList(json::value_type &jsonArray)
 QVariant JsonFlux::toVariant(json::value_type &jsonValue){
     QVariant v;
     auto valueType = jsonValue.type();
-    switch (valueType) {
+    switch (valueType)
+    {
     case json::value_t::boolean:
         v = jsonValue.get<bool>();
         break;
@@ -123,7 +125,8 @@ json::value_type JsonFlux::toJsonValue(QVariant variant)
 {
     json::value_type jsonValue;
 
-    switch (variant.type()) {
+    switch (variant.type())
+    {
     case QMetaType::Bool:
         jsonValue = variant.value<bool>();
         break;
@@ -151,7 +154,8 @@ json::value_type JsonFlux::toJsonValue(QVariant variant)
 json::value_type JsonFlux::toJsonArray(QVariantList vl)
 {
     json::value_type jsonVal;
-    for (auto v : vl){
+    for (auto v : vl)
+    {
         jsonVal.push_back(toJsonValue(v));
     }
     return jsonVal;
@@ -160,7 +164,8 @@ json::value_type JsonFlux::toJsonArray(QVariantList vl)
 json::value_type JsonFlux::toJsonObject(QVariantMap vm)
 {
     json::value_type jsonVal;
-    for (auto it = vm.begin(); it != vm.end(); ++it){
+    for (auto it = vm.begin(); it != vm.end(); ++it)
+    {
         jsonVal[it.key().toStdString()] = toJsonValue(it.value());
     }
     return jsonVal;

@@ -43,18 +43,23 @@ void JsonFluxModel::setSource(QString newSource)
     if(m_source == newSource) return;
 
     // test if source is a file
-    if(QFileInfo::exists(newSource)){
+    if(QFileInfo::exists(newSource))
+    {
         std::ifstream inf(newSource.toStdString());
 
-        if(!inf.is_open()){
+        if(!inf.is_open())
+        {
             qCritical()<<"Cannot open the json file"<<newSource;
             return;
         }
 
         inf >> m_json;
-    }else{
+    }
+    else
+    {
         m_json = json::parse(newSource.toStdString());
-        if(m_json.is_null()){
+        if(m_json.is_null())
+        {
             qCritical()<<"Cannot parse the json string"<<newSource;
             return;
         }
@@ -77,7 +82,8 @@ QVariantMap JsonFluxModel::data() const
 void JsonFluxModel::setData(QVariantMap newData)
 {
     auto newJsonObj = QJsonObject::fromVariantMap(newData);
-    if(newJsonObj.isEmpty()){
+    if(newJsonObj.isEmpty())
+    {
         qCritical()<<"The data is not a valid json!";
         return;
     }
@@ -109,10 +115,12 @@ void JsonFluxModel::setFileSync(bool newFileSync)
 bool JsonFluxModel::modify(QString jsonPath, QVariant newValue)
 {
     json::json_pointer ptr(jsonPath.toStdString());
-    try{
+    try
+    {
         m_json[ptr] = JsonFlux::toJsonValue(newValue);
     }
-    catch(std::out_of_range&){
+    catch(std::out_of_range&)
+    {
         qCritical()<<"The jsonpath is invalid!";
         return false;
     }
@@ -128,10 +136,12 @@ bool JsonFluxModel::modify(QString jsonPath, QVariant newValue)
 bool JsonFluxModel::modify(QString jsonPath, QVariantList newValues)
 {
     json::json_pointer ptr(jsonPath.toStdString());
-    try{
+    try
+    {
         m_json[ptr] = JsonFlux::toJsonArray(newValues);
     }
-    catch(std::out_of_range&){
+    catch(std::out_of_range&)
+    {
         qCritical()<<"The jsonpath is invalid!";
         return false;
     }
@@ -147,10 +157,12 @@ bool JsonFluxModel::modify(QString jsonPath, QVariantList newValues)
 bool JsonFluxModel::modify(QString jsonPath, QVariantMap newObject)
 {
     json::json_pointer ptr(jsonPath.toStdString());
-    try{
+    try
+    {
         m_json[ptr] = JsonFlux::toJsonObject(newObject);
     }
-    catch(std::out_of_range&){
+    catch(std::out_of_range&)
+    {
         qCritical()<<"The jsonpath is invalid!";
         return false;
     }
@@ -158,7 +170,8 @@ bool JsonFluxModel::modify(QString jsonPath, QVariantMap newObject)
 
     if(m_fileSync)
         return save();
-    else{
+    else
+    {
         setModified(true);
         return true;
     }
@@ -198,7 +211,8 @@ bool JsonFluxModel::save()
     if(!QFile::exists(m_source))
         return true;
     QFile outf(m_source);
-    if(!outf.open(QIODevice::WriteOnly)){
+    if(!outf.open(QIODevice::WriteOnly))
+    {
         qCritical()<<"cannot open the file"<<m_source;
         return false;
     }
@@ -209,7 +223,8 @@ bool JsonFluxModel::save()
 bool JsonFluxModel::saveAs(QString filePath)
 {
     QFile outf(filePath);
-    if(!outf.open(QIODevice::WriteOnly)){
+    if(!outf.open(QIODevice::WriteOnly))
+    {
         qCritical()<<"cannot open the file" << filePath;
         return false;
     }

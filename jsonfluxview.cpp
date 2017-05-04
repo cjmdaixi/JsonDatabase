@@ -24,7 +24,8 @@ void JsonFluxView::classBegin()
 
 void JsonFluxView::componentComplete()
 {
-    if(m_enabled && m_modelObject && !m_query.isEmpty()){
+    if(m_enabled && m_modelObject && !m_query.isEmpty())
+    {
         m_queryValues = doQuery();
         emit enabledChanged();
         emit modelChanged();
@@ -110,21 +111,27 @@ void JsonFluxView::setEnabled(bool newEnabled)
 
     m_enabled = newEnabled;
 
-    if(m_enabled){
+    if(m_enabled)
+    {
         connect(flux(), &JsonFlux::updated, this, &JsonFluxView::onModelUpdated);
-    }else{
+    }
+    else
+    {
         disconnect(flux(), &JsonFlux::updated, this, &JsonFluxView::onModelUpdated);
     }
-    if(m_initialized){
+    if(m_initialized)
+    {
         emit enabledChanged();
     }
 }
 
 void JsonFluxView::onModelUpdated(JsonFluxModel *model)
 {
-    if(m_modelObject && model == m_modelObject){
+    if(m_modelObject && model == m_modelObject)
+    {
         auto newValues = doQuery();
-        if(newValues != m_queryValues){
+        if(newValues != m_queryValues)
+        {
             m_queryValues = newValues;
             emit valuesChanged();
         }
@@ -135,17 +142,20 @@ QVariantMap JsonFluxView::doQuery() const
 {
     QVariantMap results;
     auto jsonObject = m_modelObject->jsonObject();
-    for(int i = 0; i != m_query.size(); ++i){
+    for(int i = 0; i != m_query.size(); ++i)
+    {
         auto &oneQuery = m_query[i];
         //auto foundNode = true;
         json::json_pointer ptr(oneQuery.toStdString());
-        try{
+        try
+        {
             auto jsonVal = (*jsonObject)[ptr];
             auto v = JsonFlux::toVariant(jsonVal);
             results[oneQuery] = v;
             results[QString("@%1").arg(i)] = v;
         }
-        catch(std::out_of_range&){
+        catch(std::out_of_range&)
+        {
             qCritical()<<oneQuery<<"doesn't exist!";
         }
     }

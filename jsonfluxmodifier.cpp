@@ -38,7 +38,8 @@ void JsonFluxModifier::setModelName(QString newModelName)
         return;
 
     auto newModelObj = flux()->model(newModelName);
-    if(newModelObj == Q_NULLPTR){
+    if(newModelObj == Q_NULLPTR)
+    {
         qWarning()<<"The new model does not exist!";
         return;
     }
