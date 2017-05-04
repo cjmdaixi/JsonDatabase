@@ -20,7 +20,7 @@ class JsonFlux : public QObject
 public:
     explicit JsonFlux(QObject *parent = 0);
 
-    JsonFluxModel * model(QString modelName);
+    Q_INVOKABLE JsonFluxModel * model(QString modelName);
     bool registerModel(QString modelName, JsonFluxModel *model);
     bool unregisterModel(QString modelName, bool deleteModel = false);
 

@@ -162,7 +162,7 @@ void JsonFluxConnector::doConnection()
         auto query = connection["query"].value<QString>();
         auto controlType = connection["type"].value<int>();
 
-        Connection conn (control, controlType, query);
+        Connection conn = {control, controlType, query};
         m_connectionDetails.push_back(conn);
 
         viewQuery << query;
@@ -193,7 +193,7 @@ void JsonFluxConnector::onValuesChanged()
     }
 }
 
-QList<Connection> JsonFluxConnector::searchQuery(QString query)
+QList<JsonFluxConnector::Connection> JsonFluxConnector::searchQuery(QString query)
 {
     QList<Connection> list;
     for(auto &conn : m_connectionDetails)
@@ -206,7 +206,7 @@ QList<Connection> JsonFluxConnector::searchQuery(QString query)
     return list;
 }
 
-Connection JsonFluxConnector::searchConnection(QObject *control)
+JsonFluxConnector::Connection JsonFluxConnector::searchConnection(QObject *control)
 {
     for(auto &conn : m_connectionDetails)
     {

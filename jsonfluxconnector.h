@@ -11,16 +11,6 @@ class JsonFluxModel;
 class JsonFluxView;
 class JsonFluxModifier;
 
-struct Connection{
-    QObject *control = Q_NULLPTR;
-    int controlType = 0;
-    QString query;
-    Connection(){}
-    Connection(QObject *c, int t, QString q)
-        : control(c), controlType(t), query(q)
-    {}
-};
-
 class JsonFluxConnector : public QObject, public QQmlParserStatus
 {
     Q_OBJECT
@@ -39,6 +29,12 @@ public:
         const char * propertyChangeSignal;
         const char * propertyName;
         GET_CONTENT_FUNC getContent;
+    };
+
+    struct Connection{
+        QObject *control;
+        int controlType;
+        QString query;
     };
 
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
