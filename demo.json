@@ -1,14 +1,15 @@
 {
     "widget": {
         "debug": [
-            "aaa343432",
+            "aaa3434323434343",
             "Bb",
             "Cc",
             "Dd"
         ],
         "image": {
             "alignment": "center",
-            "hOffset": 243,
+            "hOffset": 247,
+            "mipmap": false,
             "name": "sun1",
             "src": "Images/Sun.png",
             "vOffset": 250

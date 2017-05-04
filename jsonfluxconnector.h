@@ -28,9 +28,18 @@ class JsonFluxConnector : public QObject, public QQmlParserStatus
 public:
     enum ControlType{
         TextField,
-        SpinBox
+        SpinBox,
+        Switch
     };
     Q_ENUM(ControlType)
+
+    typedef QVariant (*GET_CONTENT_FUNC)(QObject *control);
+
+    struct ControlInterface{
+        const char * propertyChangeSignal;
+        const char * propertyName;
+        GET_CONTENT_FUNC getContent;
+    };
 
     Q_PROPERTY(bool enabled READ enabled WRITE setEnabled NOTIFY enabledChanged)
     Q_PROPERTY(QString modelName READ modelName WRITE setModelName NOTIFY modelChanged)
@@ -61,15 +70,17 @@ signals:
     void modelChanged();
     void connectionsChanged();
 private slots:
-    void onTextFieldTextChanged();
-    void onSpinBoxValueChanged();
-
+    void onControlContentChanged();
     void onValuesChanged();
 private:
     void doConnection();
     void doDisconnection();
     QList<Connection> searchQuery(QString query);
-    Connection searchControl(QObject *control);
+    Connection searchConnection(QObject *control);
+
+    inline const char * controlChangeSignal(int type);
+    inline const char *controlPropretyName(int type);
+    inline GET_CONTENT_FUNC controlGetContent(int type);
 private:
     bool m_enabled = true, m_initialized = false;
     JsonFluxModel *m_modelObject = Q_NULLPTR;
@@ -77,6 +88,7 @@ private:
     JsonFluxView* m_fluxView = Q_NULLPTR;
     JsonFluxModifier* m_fluxModifier = Q_NULLPTR;
     QList<Connection> m_connectionDetails;
+    static QMap<int, ControlInterface> c_controlInterfaces;
 };
 
 #endif // JSONFLUXCONNECTOR_H

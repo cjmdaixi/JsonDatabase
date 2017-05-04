@@ -9,6 +9,29 @@
 #include <QQmlEngine>
 #include <QQmlContext>
 
+QMap<int, JsonFluxConnector::ControlInterface> JsonFluxConnector::c_controlInterfaces =
+{
+    {JsonFluxConnector::TextField, {SIGNAL(textChanged()), "text", [](QObject *control)->QVariant{
+                                        return control->property("text").value<QString>();
+                                    }}},
+    {JsonFluxConnector::SpinBox, {SIGNAL(valueChanged()), "value", [](QObject *control)->QVariant{
+                                      auto newValue = control->property("value").value<qreal>();
+                                      auto decimals = control->property("decimals").value<int>();
+                                      if(decimals > 0)
+                                      {
+                                          return QVariant(newValue);
+                                      }
+                                      else
+                                      {
+                                          auto intValue = int(newValue);
+                                          return QVariant(intValue);
+                                      }
+                                  }}},
+    {JsonFluxConnector::Switch, {SIGNAL(checkedChanged()), "checked", [](QObject *control)->QVariant{
+                                     return control->property("checked").value<bool>();
+                                 }}}
+};
+
 JsonFluxConnector::JsonFluxConnector(QObject *parent)
     : QObject(parent)
 {
@@ -144,14 +167,7 @@ void JsonFluxConnector::doConnection()
 
         viewQuery << query;
 
-        if(controlType == TextField)
-        {
-            QObject::connect(control, SIGNAL(textChanged()), this, SLOT(onTextFieldTextChanged()));
-        }
-        else if(controlType == SpinBox)
-        {
-            QObject::connect(control, SIGNAL(valueChanged()), this, SLOT(onSpinBoxValueChanged()));
-        }
+        QObject::connect(control, controlChangeSignal(controlType), this, SLOT(onControlContentChanged()));
     }
     m_fluxView->setQuery(viewQuery);
 }
@@ -167,18 +183,11 @@ void JsonFluxConnector::onValuesChanged()
             auto conns = searchQuery(query);
             for(auto &conn : conns)
             {
-                conn.control->blockSignals(true);
-                switch (conn.controlType) {
-                case TextField:
-                    conn.control->setProperty("text", it.value());
-                    break;
-                case SpinBox:
-                    conn.control->setProperty("value", it.value());
-                    break;
-                default:
-                    break;
+                QObject::disconnect(conn.control, controlChangeSignal(conn.controlType), this, SLOT(onControlContentChanged()));
+                if(!conn.control->setProperty(controlPropretyName(conn.controlType), it.value())){
+                    qCritical()<<"Cannot set the property:"<<controlPropretyName(conn.controlType);
                 }
-                conn.control->blockSignals(false);
+                QObject::connect(conn.control, controlChangeSignal(conn.controlType), this, SLOT(onControlContentChanged()));
             }
         }
     }
@@ -197,7 +206,7 @@ QList<Connection> JsonFluxConnector::searchQuery(QString query)
     return list;
 }
 
-Connection JsonFluxConnector::searchControl(QObject *control)
+Connection JsonFluxConnector::searchConnection(QObject *control)
 {
     for(auto &conn : m_connectionDetails)
     {
@@ -211,53 +220,37 @@ void JsonFluxConnector::doDisconnection()
 {
     for(auto conn : m_connectionDetails)
     {
-        if(conn.controlType == TextField)
-        {
-            // disconnect
-            QObject::disconnect(conn.control, SIGNAL(textChanged()), this, SLOT(onTextFieldTextChanged()));
-        }
-        else if(conn.controlType == SpinBox)
-        {
-            QObject::disconnect(conn.control, SIGNAL(valueChanged()), this, SLOT(onSpinBoxValueChanged()));
-        }
-
+        QObject::disconnect(conn.control, controlChangeSignal(conn.controlType), this, SLOT(onControlContentChanged()));
     }
     m_connectionDetails.clear();
 }
 
-void JsonFluxConnector::onTextFieldTextChanged()
+void JsonFluxConnector::onControlContentChanged()
 {
-    auto textFieldCtrl = sender();
-    auto conn = searchControl(textFieldCtrl);
-    auto newText = textFieldCtrl->property("text").value<QString>();
+    auto qmlName = QQmlEngine::contextForObject(sender())->nameForObject(sender());
+    auto conn = searchConnection(sender());
     m_fluxModifier->setPath(conn.query);
-    if(!m_fluxModifier->modify(newText))
+
+    auto getContent = controlGetContent(conn.controlType);
+    auto newValue = getContent(conn.control);
+
+    if(!m_fluxModifier->modify(newValue))
     {
-        qCritical()<<"Cannot modify control"<<textFieldCtrl->objectName();
+        qCritical()<<"Cannot modify control"<<conn.control->objectName();
     }
 }
 
-void JsonFluxConnector::onSpinBoxValueChanged()
+const char * JsonFluxConnector::controlChangeSignal(int type)
 {
-    auto spinBoxCtrl = sender();
-    auto conn = searchControl(spinBoxCtrl);
-    m_fluxModifier->setPath(conn.query);
-    auto newValue = spinBoxCtrl->property("value").value<qreal>();
-    auto decimals = spinBoxCtrl->property("decimals").value<int>();
-    if(decimals > 0)
-    {
-        if(!m_fluxModifier->modify(newValue))
-        {
-            qCritical()<<"Cannot modify control"<<spinBoxCtrl->objectName();
-        }
-    }
-    else
-    {
-        auto intValue = int(newValue);
-        if(!m_fluxModifier->modify(intValue))
-        {
-            qCritical()<<"Cannot modify control"<<spinBoxCtrl->objectName();
-        }
-    }
+    return c_controlInterfaces[type].propertyChangeSignal;
+}
 
+const char* JsonFluxConnector::controlPropretyName(int type)
+{
+    return c_controlInterfaces[type].propertyName;
+}
+
+JsonFluxConnector::GET_CONTENT_FUNC JsonFluxConnector::controlGetContent(int type)
+{
+    return c_controlInterfaces[type].getContent;
 }

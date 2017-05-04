@@ -17,52 +17,54 @@ Window {
         fileSync: true
     }
 
-//    JsonFluxView{
-//        id: jsonQuery
-//        query: ["/widget/debug", "/widget/image"]
-//        //model: jsonModel
-//        modelName: "mymodel"
-//        property var myVar
-//        onMyVarChanged: {
-//            console.log("new myVar:", myVar);
-//        }
+    //    JsonFluxView{
+    //        id: jsonQuery
+    //        query: ["/widget/debug", "/widget/image"]
+    //        //model: jsonModel
+    //        modelName: "mymodel"
+    //        property var myVar
+    //        onMyVarChanged: {
+    //            console.log("new myVar:", myVar);
+    //        }
 
-//        onValuesChanged: {
-//           // console.log(values["@0"], values["@1"]);
-//            myVar = values["@0"];
-//        }
-//    }
+    //        onValuesChanged: {
+    //           // console.log(values["@0"], values["@1"]);
+    //            myVar = values["@0"];
+    //        }
+    //    }
 
-//    JsonFluxModifier{
-//        id: jsonModifier
-//        //model: jsonModel
-//        modelName: "mymodel"
-//    }
+    //    JsonFluxModifier{
+    //        id: jsonModifier
+    //        //model: jsonModel
+    //        modelName: "mymodel"
+    //    }
 
-//    Button{
-//        id: btn
-//        width: 100
-//        height: 50
-//        anchors.centerIn: parent
-//        text: "Click!"
+    //    Button{
+    //        id: btn
+    //        width: 100
+    //        height: 50
+    //        anchors.centerIn: parent
+    //        text: "Click!"
 
-//        onClicked:{
-//            var obj = {};
-//            obj.a = "jimmy";
-//            obj.b = "lucy";
-//            jsonModifier.modify("/widget/debug", /*false*/["Aa", "Bb", "Cc", "Dd"]/*[false, true, false]*/);
-//            //jsonModifier.modify("/widget/debug", obj);
-//        }
-//    }
+    //        onClicked:{
+    //            var obj = {};
+    //            obj.a = "jimmy";
+    //            obj.b = "lucy";
+    //            jsonModifier.modify("/widget/debug", /*false*/["Aa", "Bb", "Cc", "Dd"]/*[false, true, false]*/);
+    //            //jsonModifier.modify("/widget/debug", obj);
+    //        }
+    //    }
     JsonFluxConnector{
         id: connector
         model: jsonModel
         connections: [
-                {"control": textField1, "type": JsonFluxConnector.TextField, "query": "/widget/debug/0"},
-                {"control": textField2, "type": JsonFluxConnector.TextField, "query": "/widget/debug/0"},
-                {"control": spinBox1, "type": JsonFluxConnector.SpinBox, "query": "/widget/image/hOffset"},
-                {"control": spinBox2, "type": JsonFluxConnector.SpinBox, "query": "/widget/image/hOffset"}
-            ]
+            {"control": textField1, "type": JsonFluxConnector.TextField, "query": "/widget/debug/0"},
+            {"control": textField2, "type": JsonFluxConnector.TextField, "query": "/widget/debug/0"},
+            {"control": spinBox1, "type": JsonFluxConnector.SpinBox, "query": "/widget/image/hOffset"},
+            {"control": spinBox2, "type": JsonFluxConnector.SpinBox, "query": "/widget/image/hOffset"},
+            {"control": switch1, "type": JsonFluxConnector.Switch, "query": "/widget/image/mipmap"},
+            {"control": switch2, "type": JsonFluxConnector.Switch, "query": "/widget/image/mipmap"}
+        ]
     }
 
     TextField{
@@ -92,5 +94,19 @@ Window {
         height: 20
         maximumValue: 10000
         anchors{centerIn: parent; horizontalCenterOffset: 100; verticalCenterOffset: 50}
+    }
+
+    Switch{
+        id: switch1
+        width: 120
+        height: 20
+        anchors{centerIn: parent; horizontalCenterOffset: -100; verticalCenterOffset: 80}
+    }
+
+    Switch{
+        id: switch2
+        width: 120
+        height: 20
+        anchors{centerIn: parent; horizontalCenterOffset: 100; verticalCenterOffset: 80}
     }
 }
