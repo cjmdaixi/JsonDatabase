@@ -57,12 +57,12 @@ Window {
     JsonFluxConnector{
         id: connector
         model: jsonModel
-        connections: {
-            [
+        connections: [
                 {"control": textField1, "type": JsonFluxConnector.TextField, "query": "/widget/debug/0"},
-                {"control": textField2, "type": JsonFluxConnector.TextField, "query": "/widget/debug/0"}
+                {"control": textField2, "type": JsonFluxConnector.TextField, "query": "/widget/debug/0"},
+                {"control": spinBox1, "type": JsonFluxConnector.SpinBox, "query": "/widget/image/hOffset"},
+                {"control": spinBox2, "type": JsonFluxConnector.SpinBox, "query": "/widget/image/hOffset"}
             ]
-        }
     }
 
     TextField{
@@ -76,5 +76,21 @@ Window {
         width: 120
         height: 50
         anchors{centerIn: parent; horizontalCenterOffset: 100}
+    }
+
+    SpinBox{
+        id: spinBox1
+        width: 120
+        height: 20
+        maximumValue: 10000
+        anchors{centerIn: parent; horizontalCenterOffset: -100; verticalCenterOffset: 50}
+    }
+
+    SpinBox{
+        id: spinBox2
+        width: 120
+        height: 20
+        maximumValue: 10000
+        anchors{centerIn: parent; horizontalCenterOffset: 100; verticalCenterOffset: 50}
     }
 }

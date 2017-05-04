@@ -1,14 +1,14 @@
 {
     "widget": {
         "debug": [
-            "Aa",
+            "aaa3434",
             "Bb",
             "Cc",
             "Dd"
         ],
         "image": {
             "alignment": "center",
-            "hOffset": 250,
+            "hOffset": 242.0,
             "name": "sun1",
             "src": "Images/Sun.png",
             "vOffset": 250

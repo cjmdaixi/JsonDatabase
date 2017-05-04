@@ -90,6 +90,12 @@ QVariant JsonFlux::toVariant(json::value_type &jsonValue){
     else if(valueType == json::value_t::number_integer){
         v = jsonValue.get<int>();
     }
+    else if(valueType == json::value_t::number_unsigned){
+        v = jsonValue.get<quint32>();
+    }
+    else if(valueType == json::value_t::number_float){
+        v = jsonValue.get<qreal>();
+    }
     else if(valueType == detail::value_t::array){
         QVariantList vl;
         for(auto it = jsonValue.begin(); it != jsonValue.end(); ++it){
@@ -117,6 +123,9 @@ json::value_type JsonFlux::toJsonValue(QVariant variant)
         break;
     case QMetaType::Int:
         jsonValue = variant.value<int>();
+        break;
+    case QMetaType::QReal:
+        jsonValue = variant.value<qreal>();
         break;
     case QMetaType::QJsonValue:
         jsonValue = toJsonArray(variant.value<QVariantList>());

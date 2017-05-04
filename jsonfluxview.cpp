@@ -45,13 +45,15 @@ void JsonFluxView::setModelName(QString newModelName)
         return;
 
     auto newModelObj = flux()->model(newModelName);
-    if(newModelObj == Q_NULLPTR){
+    if(newModelObj == Q_NULLPTR)
+    {
         qWarning()<<"The new model does not exist!";
         return;
     }
     m_modelObject = newModelObj;
 
-    if(m_initialized){
+    if(m_initialized)
+    {
         emit modelChanged();
     }
 }
@@ -67,7 +69,8 @@ void JsonFluxView::setModel(JsonFluxModel *newModel)
 
     m_modelObject = newModel;
 
-    if(m_initialized){
+    if(m_initialized)
+    {
         emit modelChanged();
         emit valuesChanged();
     }
@@ -84,7 +87,8 @@ void JsonFluxView::setQuery(QStringList newQuery)
 
     m_query = newQuery;
 
-    if(m_initialized){
+    if(m_initialized)
+    {
         emit valuesChanged();
         emit queryChanged();
     }

@@ -61,8 +61,8 @@ signals:
     void modelChanged();
     void connectionsChanged();
 private slots:
-    void onTextFieldEditingFinished();
-    void onSpinBoxEditingFinished();
+    void onTextFieldTextChanged();
+    void onSpinBoxValueChanged();
 
     void onValuesChanged();
 private:

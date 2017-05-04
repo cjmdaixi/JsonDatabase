@@ -34,6 +34,8 @@ void JsonFluxConnector::componentComplete()
         }
 
         QObject::connect(m_fluxView, &JsonFluxView::valuesChanged, this, &JsonFluxConnector::onValuesChanged);
+        m_fluxView->componentComplete();
+
         emit enabledChanged();
     }
     m_initialized = true;
@@ -81,6 +83,8 @@ void JsonFluxConnector::setModelName(QString newModelName)
         return;
     }
     m_modelObject = newModelObj;
+    m_fluxView->setModel(m_modelObject);
+    m_fluxModifier->setModel(m_modelObject);
 
     if(m_initialized)
     {
@@ -98,7 +102,8 @@ void JsonFluxConnector::setModel(JsonFluxModel *newModel)
     if(m_modelObject == newModel) return;
 
     m_modelObject = newModel;
-
+    m_fluxView->setModel(m_modelObject);
+    m_fluxModifier->setModel(m_modelObject);
     if(m_initialized)
     {
         emit modelChanged();
@@ -141,11 +146,11 @@ void JsonFluxConnector::doConnection()
 
         if(controlType == TextField)
         {
-            QObject::connect(control, SIGNAL(editingFinished()), this, SLOT(onTextFieldEditingFinished()));
+            QObject::connect(control, SIGNAL(textChanged()), this, SLOT(onTextFieldTextChanged()));
         }
         else if(controlType == SpinBox)
         {
-
+            QObject::connect(control, SIGNAL(valueChanged()), this, SLOT(onSpinBoxValueChanged()));
         }
     }
     m_fluxView->setQuery(viewQuery);
@@ -164,7 +169,14 @@ void JsonFluxConnector::onValuesChanged()
             {
                 switch (conn.controlType) {
                 case TextField:
+                    conn.control->blockSignals(true);
                     conn.control->setProperty("text", it.value());
+                    conn.control->blockSignals(false);
+                    break;
+                case SpinBox:
+                    conn.control->blockSignals(true);
+                    conn.control->setProperty("value", it.value());
+                    conn.control->blockSignals(false);
                     break;
                 default:
                     break;
@@ -215,7 +227,7 @@ void JsonFluxConnector::doDisconnection()
     m_connectionDetails.clear();
 }
 
-void JsonFluxConnector::onTextFieldEditingFinished()
+void JsonFluxConnector::onTextFieldTextChanged()
 {
     auto textFieldCtrl = sender();
     auto conn = searchControl(textFieldCtrl);
@@ -227,7 +239,14 @@ void JsonFluxConnector::onTextFieldEditingFinished()
     }
 }
 
-void JsonFluxConnector::onSpinBoxEditingFinished()
+void JsonFluxConnector::onSpinBoxValueChanged()
 {
-
+    auto spinBoxCtrl = sender();
+    auto conn = searchControl(spinBoxCtrl);
+    auto newValue = spinBoxCtrl->property("value").value<qreal>();
+    m_fluxModifier->setPath(conn.query);
+    if(!m_fluxModifier->modify(newValue))
+    {
+        qCritical()<<"Cannot modify control"<<spinBoxCtrl->objectName();
+    }
 }
