@@ -11,24 +11,26 @@ class JsonFluxModel;
 class JsonFluxView;
 class JsonFluxModifier;
 
-class JsonFluxConnector : public QObject, public QQmlParserStatus
+class JsonFluxConnector : public QObject
 {
     Q_OBJECT
-    Q_INTERFACES(QQmlParserStatus)
 public:
     enum ControlType{
         TextField,
         SpinBox,
-        Switch
+        Switch,
+        ComboBox
     };
     Q_ENUM(ControlType)
 
     typedef QVariant (*GET_CONTENT_FUNC)(QObject *control);
+    typedef bool (*SET_CONTENT_FUNC)(QObject *control, QVariant variant);
 
     struct ControlInterface{
         const char * propertyChangeSignal;
         const char * propertyName;
         GET_CONTENT_FUNC getContent;
+        SET_CONTENT_FUNC setContent;
     };
 
     struct Connection{
@@ -42,10 +44,8 @@ public:
     Q_PROPERTY(JsonFluxModel* model READ model WRITE setModel NOTIFY modelChanged)
     Q_PROPERTY(QVariantList connections READ connections WRITE setConnections NOTIFY connectionsChanged)
 
-    explicit JsonFluxConnector(QObject *parent = 0);
-
-    void classBegin() Q_DECL_OVERRIDE;
-    void componentComplete() Q_DECL_OVERRIDE;
+    explicit JsonFluxConnector(JsonFluxModel *modelObject, QObject *parent = 0);
+    ~JsonFluxConnector();
 
     bool enabled() const;
     void setEnabled(bool newEnabled);
@@ -60,6 +60,8 @@ public:
     void setConnections(QVariantList newConnections);
 
 
+    Q_INVOKABLE void addConnection(QVariantMap newConnection);
+    Q_INVOKABLE void addConnections(QVariantList newConnections);
 signals:
     void enabledChanged();
     void modelNameChanged();
@@ -77,8 +79,9 @@ private:
     inline const char * controlChangeSignal(int type);
     inline const char *controlPropretyName(int type);
     inline GET_CONTENT_FUNC controlGetContent(int type);
+    inline SET_CONTENT_FUNC controlSetContent(int type);
 private:
-    bool m_enabled = true, m_initialized = false;
+    bool m_enabled = true;
     JsonFluxModel *m_modelObject = Q_NULLPTR;
     QVariantList m_connections;
     JsonFluxView* m_fluxView = Q_NULLPTR;

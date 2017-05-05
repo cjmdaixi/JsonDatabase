@@ -8,60 +8,91 @@
 #include <QMetaProperty>
 #include <QQmlEngine>
 #include <QQmlContext>
+#include <QQmlProperty>
+#include <QtQml>
+#include <QQuickItem>
 
 QMap<int, JsonFluxConnector::ControlInterface> JsonFluxConnector::c_controlInterfaces =
 {
-    {JsonFluxConnector::TextField, {SIGNAL(textChanged()), "text", [](QObject *control)->QVariant{
-                                        return control->property("text").value<QString>();
-                                    }}},
-    {JsonFluxConnector::SpinBox, {SIGNAL(valueChanged()), "value", [](QObject *control)->QVariant{
-                                      auto newValue = control->property("value").value<qreal>();
-                                      auto decimals = control->property("decimals").value<int>();
-                                      if(decimals > 0)
-                                      {
-                                          return QVariant(newValue);
-                                      }
-                                      else
-                                      {
-                                          auto intValue = int(newValue);
-                                          return QVariant(intValue);
-                                      }
-                                  }}},
-    {JsonFluxConnector::Switch, {SIGNAL(checkedChanged()), "checked", [](QObject *control)->QVariant{
-                                     return control->property("checked").value<bool>();
-                                 }}}
+    {
+        JsonFluxConnector::TextField,
+        {
+            SIGNAL(textChanged()), "text",
+            [](QObject *control)->QVariant{
+                return control->property("text").value<QString>();
+            },
+            [](QObject *control, QVariant variant)->bool{
+                return control->setProperty("text", variant);
+            }
+        }
+    },
+
+    {
+        JsonFluxConnector::SpinBox,
+        {
+            SIGNAL(valueChanged()), "value",
+            [](QObject *control)->QVariant{
+                auto newValue = control->property("value").value<qreal>();
+                auto decimals = control->property("decimals").value<int>();
+                if(decimals > 0)
+                {
+                    return QVariant(newValue);
+                }
+                else
+                {
+                    auto intValue = int(newValue);
+                    return QVariant(intValue);
+                }
+            },
+            [](QObject *control, QVariant variant)->bool{
+                return control->setProperty("value", variant);
+            }
+        }
+    },
+
+    {
+        JsonFluxConnector::Switch,
+        {
+            SIGNAL(checkedChanged()), "checked",
+            [](QObject *control)->QVariant{
+                return control->property("checked").value<bool>();
+            },
+            [](QObject *control, QVariant variant)->bool{
+                return control->setProperty("checked", variant);
+            }
+        }
+    },
+
+    {
+        JsonFluxConnector::ComboBox,
+        {
+            SIGNAL(currentTextChanged()), "currentText",
+            [](QObject *control)->QVariant{
+                return control->property("currentText").value<QString>();
+            },
+            [](QObject *control, QVariant variant)->bool{
+                auto strIndex = -1;
+                QVariant varIndex;
+                QMetaObject::invokeMethod(control, "find", Q_RETURN_ARG(QVariant, varIndex), Q_ARG(QVariant, variant));
+                strIndex = varIndex.value<int>();
+                return control->setProperty("currentIndex", strIndex);
+            }
+        }
+    }
 };
 
-JsonFluxConnector::JsonFluxConnector(QObject *parent)
-    : QObject(parent)
+JsonFluxConnector::JsonFluxConnector(JsonFluxModel *modelObject, QObject *parent)
+    : QObject(parent), m_modelObject(modelObject)
 {
-    m_fluxView = new JsonFluxView(this);
-    m_fluxModifier = new JsonFluxModifier(this);
+    m_fluxView = new JsonFluxView(m_modelObject, this);
+    m_fluxModifier = new JsonFluxModifier(m_modelObject, this);
+
+    QObject::connect(m_fluxView, &JsonFluxView::valuesChanged, this, &JsonFluxConnector::onValuesChanged);
 }
 
-
-void JsonFluxConnector::classBegin()
+JsonFluxConnector::~JsonFluxConnector()
 {
-    m_initialized = false;
-}
-
-void JsonFluxConnector::componentComplete()
-{
-    if(m_enabled && m_modelObject)
-    {
-        emit modelChanged();
-        if(!m_connections.empty())
-        {
-            doConnection();
-            emit connectionsChanged();
-        }
-
-        QObject::connect(m_fluxView, &JsonFluxView::valuesChanged, this, &JsonFluxConnector::onValuesChanged);
-        m_fluxView->componentComplete();
-
-        emit enabledChanged();
-    }
-    m_initialized = true;
+    qDebug()<<"Connector destroyed";
 }
 
 bool JsonFluxConnector::enabled() const
@@ -75,17 +106,14 @@ void JsonFluxConnector::setEnabled(bool newEnabled)
 
     m_enabled = newEnabled;
 
-    if(m_initialized)
+    emit enabledChanged();
+    if(m_enabled)
     {
-        emit enabledChanged();
-        if(m_enabled)
-        {
-            QObject::connect(m_fluxView, &JsonFluxView::valuesChanged, this, &JsonFluxConnector::onValuesChanged);
-        }
-        else
-        {
-            QObject::disconnect(m_fluxView, &JsonFluxView::valuesChanged, this, &JsonFluxConnector::onValuesChanged);
-        }
+        QObject::connect(m_fluxView, &JsonFluxView::valuesChanged, this, &JsonFluxConnector::onValuesChanged);
+    }
+    else
+    {
+        QObject::disconnect(m_fluxView, &JsonFluxView::valuesChanged, this, &JsonFluxConnector::onValuesChanged);
     }
 }
 
@@ -109,10 +137,7 @@ void JsonFluxConnector::setModelName(QString newModelName)
     m_fluxView->setModel(m_modelObject);
     m_fluxModifier->setModel(m_modelObject);
 
-    if(m_initialized)
-    {
-        emit modelChanged();
-    }
+    emit modelChanged();
 }
 
 JsonFluxModel* JsonFluxConnector::model() const
@@ -127,10 +152,7 @@ void JsonFluxConnector::setModel(JsonFluxModel *newModel)
     m_modelObject = newModel;
     m_fluxView->setModel(m_modelObject);
     m_fluxModifier->setModel(m_modelObject);
-    if(m_initialized)
-    {
-        emit modelChanged();
-    }
+    emit modelChanged();
 }
 
 QVariantList JsonFluxConnector::connections() const
@@ -142,14 +164,43 @@ void JsonFluxConnector::setConnections(QVariantList newConnections)
 {
     if(m_connections == newConnections) return;
 
+    doDisconnection();
     m_connections = newConnections;
 
-    if(m_initialized)
+    doConnection();
+    emit connectionsChanged();
+}
+
+void JsonFluxConnector::addConnection(QVariantMap newConnection)
+{
+    auto control = newConnection["control"].value<QObject*>();
+    auto query = newConnection["query"].value<QString>();
+    auto controlType = newConnection["type"].value<int>();
+
+    Connection conn = {control, controlType, query};
+    m_connectionDetails.push_back(conn);
+
+    auto queries = m_fluxView->query();
+    queries << query;
+
+    m_fluxView->setQuery(queries);
+}
+
+void JsonFluxConnector::addConnections(QVariantList newConnections)
+{
+    QStringList viewQuery = m_fluxView->query();
+    for(auto cnVar : newConnections)
     {
-        doDisconnection();
-        doConnection();
-        emit connectionsChanged();
+        auto connection = cnVar.value<QVariantMap>();
+        auto control = connection["control"].value<QObject*>();
+        auto query = connection["query"].value<QString>();
+        auto controlType = connection["type"].value<int>();
+
+        Connection conn = {control, controlType, query};
+        m_connectionDetails.push_back(conn);
+        viewQuery << query;
     }
+    m_fluxView->setQuery(viewQuery);
 }
 
 void JsonFluxConnector::doConnection()
@@ -164,10 +215,7 @@ void JsonFluxConnector::doConnection()
 
         Connection conn = {control, controlType, query};
         m_connectionDetails.push_back(conn);
-
         viewQuery << query;
-
-        QObject::connect(control, controlChangeSignal(controlType), this, SLOT(onControlContentChanged()));
     }
     m_fluxView->setQuery(viewQuery);
 }
@@ -184,7 +232,8 @@ void JsonFluxConnector::onValuesChanged()
             for(auto &conn : conns)
             {
                 QObject::disconnect(conn.control, controlChangeSignal(conn.controlType), this, SLOT(onControlContentChanged()));
-                if(!conn.control->setProperty(controlPropretyName(conn.controlType), it.value())){
+                auto setContent = controlSetContent(conn.controlType);
+                if(!setContent(conn.control, it.value())){
                     qCritical()<<"Cannot set the property:"<<controlPropretyName(conn.controlType);
                 }
                 QObject::connect(conn.control, controlChangeSignal(conn.controlType), this, SLOT(onControlContentChanged()));
@@ -253,4 +302,9 @@ const char* JsonFluxConnector::controlPropretyName(int type)
 JsonFluxConnector::GET_CONTENT_FUNC JsonFluxConnector::controlGetContent(int type)
 {
     return c_controlInterfaces[type].getContent;
+}
+
+JsonFluxConnector::SET_CONTENT_FUNC JsonFluxConnector::controlSetContent(int type)
+{
+    return c_controlInterfaces[type].setContent;
 }

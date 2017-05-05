@@ -13,14 +13,20 @@ using namespace nlohmann;
 
 class JsonFluxModel;
 class JsonFluxView;
+class JsonFluxConnector;
 
 class JsonFlux : public QObject
 {
     Q_OBJECT
 public:
     explicit JsonFlux(QObject *parent = 0);
+    ~JsonFlux();
 
     Q_INVOKABLE JsonFluxModel * model(QString modelName);
+    Q_INVOKABLE JsonFluxConnector * connector(QString connectorName);
+    Q_INVOKABLE JsonFluxConnector * getOrCreateConnector(QString connectorName, QString modelName);
+    Q_INVOKABLE JsonFluxConnector * getOrCreateConnector(QString connectorName, JsonFluxModel *modelObject);
+
     bool registerModel(QString modelName, JsonFluxModel *model);
     bool unregisterModel(QString modelName, bool deleteModel = false);
 
@@ -37,6 +43,7 @@ public slots:
 
 private:
     QMap<QString, JsonFluxModel*> m_models;
+    QMap<QString, JsonFluxConnector*> m_connectors;
 };
 
 JsonFlux *flux();

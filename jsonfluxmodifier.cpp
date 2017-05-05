@@ -8,9 +8,15 @@ JsonFluxModifier::JsonFluxModifier(QObject *parent)
 
 }
 
-JsonFluxModifier::~JsonFluxModifier()
+JsonFluxModifier::JsonFluxModifier(JsonFluxModel *modelObject, QObject *parent)
+    : QObject(parent), m_modelObject(modelObject)
 {
 
+}
+
+JsonFluxModifier::~JsonFluxModifier()
+{
+    qDebug()<<"Modifier destroyed";
 }
 
 JsonFluxModel * JsonFluxModifier::model() const

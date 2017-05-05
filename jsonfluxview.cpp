@@ -13,8 +13,16 @@ JsonFluxView::JsonFluxView(QObject *parent)
     connect(flux(), &JsonFlux::updated, this, &JsonFluxView::onModelUpdated);
 }
 
+JsonFluxView::JsonFluxView(JsonFluxModel *modelObject, QObject *parent)
+    : QObject(parent), m_modelObject(modelObject)
+{
+    connect(flux(), &JsonFlux::updated, this, &JsonFluxView::onModelUpdated);
+    m_initialized = true;
+}
+
 JsonFluxView::~JsonFluxView()
 {
+    qDebug()<<"View destroyed";
 }
 
 void JsonFluxView::classBegin()
@@ -90,6 +98,7 @@ void JsonFluxView::setQuery(QStringList newQuery)
 
     if(m_initialized)
     {
+        m_queryValues = doQuery();
         emit valuesChanged();
         emit queryChanged();
     }

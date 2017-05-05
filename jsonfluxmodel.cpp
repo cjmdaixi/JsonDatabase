@@ -16,6 +16,7 @@ JsonFluxModel::JsonFluxModel(QObject *parent)
 JsonFluxModel::~JsonFluxModel()
 {
     flux()->unregisterModel(m_name);
+    qDebug()<<"Model destroyed";
 }
 
 QString JsonFluxModel::name() const

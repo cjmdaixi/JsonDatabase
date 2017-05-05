@@ -54,30 +54,31 @@ Window {
     //            //jsonModifier.modify("/widget/debug", obj);
     //        }
     //    }
-    JsonFluxConnector{
-        id: connector
-        model: jsonModel
-        connections: [
-            {"control": textField1, "type": JsonFluxConnector.TextField, "query": "/widget/debug/0"},
-            {"control": textField2, "type": JsonFluxConnector.TextField, "query": "/widget/debug/0"},
-            {"control": spinBox1, "type": JsonFluxConnector.SpinBox, "query": "/widget/image/hOffset"},
-            {"control": spinBox2, "type": JsonFluxConnector.SpinBox, "query": "/widget/image/hOffset"},
-            {"control": switch1, "type": JsonFluxConnector.Switch, "query": "/widget/image/mipmap"},
-            {"control": switch2, "type": JsonFluxConnector.Switch, "query": "/widget/image/mipmap"}
-        ]
+
+    Component.onCompleted: {
+        var connector = JsonFlux.getOrCreateConnector("myConnector", jsonModel);
+        connector.addConnections( [
+                    {"control": textField1, "type": JsonFluxConnector.TextField, "query": "/widget/debug/0"},
+                    {"control": textField2, "type": JsonFluxConnector.TextField, "query": "/widget/debug/0"},
+                    {"control": spinBox1, "type": JsonFluxConnector.SpinBox, "query": "/widget/image/hOffset"},
+                    {"control": spinBox2, "type": JsonFluxConnector.SpinBox, "query": "/widget/image/hOffset"},
+                    {"control": switch1, "type": JsonFluxConnector.Switch, "query": "/widget/image/mipmap"},
+                    {"control": switch2, "type": JsonFluxConnector.Switch, "query": "/widget/image/mipmap"}
+                    //
+                ]);
     }
 
     TextField{
         id: textField1
         width: 120
         height: 50
-        anchors{centerIn: parent; horizontalCenterOffset: -100}
+        anchors{centerIn: parent; horizontalCenterOffset: -100; verticalCenterOffset: -100}
     }
     TextField{
         id: textField2
         width: 120
         height: 50
-        anchors{centerIn: parent; horizontalCenterOffset: 100}
+        anchors{centerIn: parent; horizontalCenterOffset: 100; verticalCenterOffset: -100}
     }
 
     SpinBox{
@@ -85,7 +86,7 @@ Window {
         width: 120
         height: 20
         maximumValue: 10000
-        anchors{centerIn: parent; horizontalCenterOffset: -100; verticalCenterOffset: 50}
+        anchors{centerIn: parent; horizontalCenterOffset: -100; verticalCenterOffset: -50}
     }
 
     SpinBox{
@@ -93,20 +94,45 @@ Window {
         width: 120
         height: 20
         maximumValue: 10000
-        anchors{centerIn: parent; horizontalCenterOffset: 100; verticalCenterOffset: 50}
+        anchors{centerIn: parent; horizontalCenterOffset: 100; verticalCenterOffset: -50}
     }
 
     Switch{
         id: switch1
         width: 120
         height: 20
-        anchors{centerIn: parent; horizontalCenterOffset: -100; verticalCenterOffset: 80}
+        anchors{centerIn: parent; horizontalCenterOffset: -100; verticalCenterOffset: 0}
     }
 
     Switch{
         id: switch2
         width: 120
         height: 20
-        anchors{centerIn: parent; horizontalCenterOffset: 100; verticalCenterOffset: 80}
+        anchors{centerIn: parent; horizontalCenterOffset: 100; verticalCenterOffset: 0}
+    }
+
+    ComboBox{
+        id: comboBox1
+        width: 120
+        height: 20
+        anchors{centerIn: parent; horizontalCenterOffset: -100; verticalCenterOffset: 50}
+        model:["bold", "italic", "normal"]
+        Component.onCompleted: {
+            var conn = JsonFlux.getOrCreateConnector("myConnector", jsonModel);
+            conn.addConnection({"control": comboBox1, "type": JsonFluxConnector.ComboBox, "query": "/widget/text/style"});
+        }
+    }
+
+    ComboBox{
+        id: comboBox2
+        width: 120
+        height: 20
+        anchors{centerIn: parent; horizontalCenterOffset: 100; verticalCenterOffset: 50}
+        model:["bold", "italic", "normal"]
+        Component.onCompleted: {
+            var conn = JsonFlux.getOrCreateConnector("myConnector", jsonModel);
+            conn.addConnection({"control": comboBox2, "type": JsonFluxConnector.ComboBox, "query": "/widget/text/style"});
+        }
+
     }
 }

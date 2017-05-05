@@ -3,6 +3,7 @@
 #include "jsonfluxview.h"
 #include "jsonfluxmodifier.h"
 #include "jsonfluxconnector.h"
+#include <QQmlEngine>
 
 Q_GLOBAL_STATIC(JsonFlux, gJsonFlux)
 
@@ -15,8 +16,9 @@ static QObject * json_flux_singletontype_provider(QQmlEngine *engine, QJSEngine 
 {
     Q_UNUSED(engine)
     Q_UNUSED(scriptEngine)
-
-    return flux();
+    auto f = flux();
+    QQmlEngine::setObjectOwnership(f, QQmlEngine::CppOwnership);
+    return f;
 }
 
 static void preCreateJsonDatabase()
@@ -25,7 +27,8 @@ static void preCreateJsonDatabase()
     qmlRegisterType<JsonFluxModel>("JsonFlux", 1, 0, "JsonFluxModel");
     qmlRegisterType<JsonFluxView>("JsonFlux", 1, 0, "JsonFluxView");
     qmlRegisterType<JsonFluxModifier>("JsonFlux", 1, 0, "JsonFluxModifier");
-    qmlRegisterType<JsonFluxConnector>("JsonFlux", 1, 0, "JsonFluxConnector");
+    qmlRegisterUncreatableType<JsonFluxConnector>("JsonFlux", 1, 0, "JsonFluxConnector",
+                                                  "JsonFluxConnector cannot be created directly. Using JsonFlux.createConnector instead.");
     qDebug()<<"register json flux types";
 }
 
@@ -36,9 +39,39 @@ JsonFlux::JsonFlux(QObject *parent) : QObject(parent)
 
 }
 
+JsonFlux::~JsonFlux()
+{
+    qDebug()<<"JsonFlux destroyed";
+}
+
 JsonFluxModel * JsonFlux::model(QString modelName)
 {
     return m_models.value(modelName, Q_NULLPTR);
+}
+
+JsonFluxConnector * JsonFlux::connector(QString connectorName)
+{
+    return m_connectors.value(connectorName, Q_NULLPTR);
+}
+
+JsonFluxConnector * JsonFlux::getOrCreateConnector(QString connectorName, QString modelName)
+{
+    auto modelObject = model(modelName);
+    if(modelObject == Q_NULLPTR) return Q_NULLPTR;
+
+    return getOrCreateConnector(connectorName, modelObject);
+}
+
+JsonFluxConnector * JsonFlux::getOrCreateConnector(QString connectorName, JsonFluxModel *modelObject)
+{
+    if(modelObject == Q_NULLPTR) return Q_NULLPTR;
+
+    if(connector(connectorName)) return connector(connectorName);
+    auto newConnector = new JsonFluxConnector(modelObject, this);
+    QQmlEngine::setObjectOwnership(newConnector, QQmlEngine::CppOwnership);
+
+    m_connectors[connectorName] = newConnector;
+    return newConnector;
 }
 
 bool JsonFlux::registerModel(QString modelName, JsonFluxModel *model)

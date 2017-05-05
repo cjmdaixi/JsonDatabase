@@ -17,6 +17,7 @@ public:
     Q_PROPERTY(QString path READ path WRITE setPath NOTIFY pathChanged)
 
     explicit JsonFluxModifier(QObject *parent = 0);
+    explicit JsonFluxModifier(JsonFluxModel *modelObject, QObject *parent = Q_NULLPTR);
     ~JsonFluxModifier();
 
     JsonFluxModel * model() const;

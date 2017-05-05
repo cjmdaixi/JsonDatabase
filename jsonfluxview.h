@@ -21,6 +21,7 @@ public:
     Q_PROPERTY(JsonFluxModel* model READ model WRITE setModel NOTIFY modelChanged)
 
     explicit JsonFluxView(QObject *parent = Q_NULLPTR);
+    explicit JsonFluxView(JsonFluxModel *modelObject, QObject *parent = Q_NULLPTR);
     ~JsonFluxView();
 
     void classBegin() Q_DECL_OVERRIDE;
