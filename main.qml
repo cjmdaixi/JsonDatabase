@@ -135,4 +135,16 @@ Window {
         }
 
     }
+
+    ComboBox{
+        id: comboBox3
+        width: 120
+        height: 20
+        anchors{centerIn: parent; horizontalCenterOffset: -100; verticalCenterOffset: 150}
+        model: JsonFlux.getOrCreateListModel("myList", "/widget/testArray", jsonModel)
+//        delegate: Text{
+//            text: "aaa"
+//        }
+        //textRole: "textRole"
+    }
 }

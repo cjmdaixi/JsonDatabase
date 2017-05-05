@@ -3,6 +3,7 @@
 #include "jsonfluxview.h"
 #include "jsonfluxmodifier.h"
 #include "jsonfluxconnector.h"
+#include "jsonfluxlistmodel.h"
 #include <QQmlEngine>
 
 Q_GLOBAL_STATIC(JsonFlux, gJsonFlux)
@@ -29,6 +30,8 @@ static void preCreateJsonDatabase()
     qmlRegisterType<JsonFluxModifier>("JsonFlux", 1, 0, "JsonFluxModifier");
     qmlRegisterUncreatableType<JsonFluxConnector>("JsonFlux", 1, 0, "JsonFluxConnector",
                                                   "JsonFluxConnector cannot be created directly. Using JsonFlux.createConnector instead.");
+    qmlRegisterUncreatableType<JsonFluxListModel>("JsonFlux", 1, 0, "JsonFluxListModel",
+                                                  "JsonFluxListModel cannot be created directly. Using JsonFlux.createListModel instead.");
     qDebug()<<"register json flux types";
 }
 
@@ -41,7 +44,7 @@ JsonFlux::JsonFlux(QObject *parent) : QObject(parent)
 
 JsonFlux::~JsonFlux()
 {
-    qDebug()<<"JsonFlux destroyed";
+    //qDebug()<<"JsonFlux destroyed";
 }
 
 JsonFluxModel * JsonFlux::model(QString modelName)
@@ -72,6 +75,32 @@ JsonFluxConnector * JsonFlux::getOrCreateConnector(QString connectorName, JsonFl
 
     m_connectors[connectorName] = newConnector;
     return newConnector;
+}
+
+JsonFluxListModel * JsonFlux::listModel(QString listName)
+{
+    return m_listModels.value(listName, Q_NULLPTR);
+}
+
+JsonFluxListModel * JsonFlux::getOrCreateListModel(QString listName, QString query, QString modelName)
+{
+    auto modelObject = model(modelName);
+    if(modelObject == Q_NULLPTR) return Q_NULLPTR;
+
+    return getOrCreateListModel(listName, query, modelObject);
+}
+
+JsonFluxListModel * JsonFlux::getOrCreateListModel(QString listName, QString query, JsonFluxModel *modelObject)
+{
+    if(modelObject == Q_NULLPTR) return Q_NULLPTR;
+
+    if(listModel(listName)) return listModel(listName);
+
+    auto newListModel = new JsonFluxListModel(modelObject, query, this);
+    QQmlEngine::setObjectOwnership(newListModel, QQmlEngine::CppOwnership);
+
+    m_listModels[listName] = newListModel;
+    return newListModel;
 }
 
 bool JsonFlux::registerModel(QString modelName, JsonFluxModel *model)

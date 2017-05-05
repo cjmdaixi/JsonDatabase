@@ -1,19 +1,24 @@
 {
     "widget": {
         "debug": [
-            "343434",
+            "3434342df",
             "Bb",
             "Cc",
             "Dd"
         ],
         "image": {
             "alignment": "center",
-            "hOffset": 246,
+            "hOffset": 1246,
             "mipmap": true,
             "name": "sun1",
             "src": "Images/Sun.png",
             "vOffset": 250
         },
+        "testArray":[
+        {"xname": "jimmy", "age": 20},
+        {"xname": "lucy", "age": 23},
+        {"xname": "lily", "age": 24}
+        ],
         "text": {
             "alignment": "center",
             "data": "Click Here",
@@ -21,7 +26,7 @@
             "name": "text1",
             "onMouseUp": "sun1.opacity = (sun1.opacity / 100) * 90;",
             "size": 36,
-            "style": "bold",
+            "style": "italic",
             "vOffset": 100
         },
         "window": {

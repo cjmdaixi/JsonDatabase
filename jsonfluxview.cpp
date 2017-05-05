@@ -22,7 +22,7 @@ JsonFluxView::JsonFluxView(JsonFluxModel *modelObject, QObject *parent)
 
 JsonFluxView::~JsonFluxView()
 {
-    qDebug()<<"View destroyed";
+    //qDebug()<<"View destroyed";
 }
 
 void JsonFluxView::classBegin()

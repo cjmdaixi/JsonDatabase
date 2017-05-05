@@ -19,7 +19,8 @@ public:
         TextField,
         SpinBox,
         Switch,
-        ComboBox
+        ComboBox/*,
+        ListView*/
     };
     Q_ENUM(ControlType)
 
@@ -87,7 +88,7 @@ private:
     JsonFluxView* m_fluxView = Q_NULLPTR;
     JsonFluxModifier* m_fluxModifier = Q_NULLPTR;
     QList<Connection> m_connectionDetails;
-    static QMap<int, ControlInterface> c_controlInterfaces;
+    static QMap<int, ControlInterface> UIControlInterfaces;
 };
 
 #endif // JSONFLUXCONNECTOR_H

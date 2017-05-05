@@ -16,7 +16,7 @@ JsonFluxModifier::JsonFluxModifier(JsonFluxModel *modelObject, QObject *parent)
 
 JsonFluxModifier::~JsonFluxModifier()
 {
-    qDebug()<<"Modifier destroyed";
+    //qDebug()<<"Modifier destroyed";
 }
 
 JsonFluxModel * JsonFluxModifier::model() const

@@ -12,7 +12,7 @@
 #include <QtQml>
 #include <QQuickItem>
 
-QMap<int, JsonFluxConnector::ControlInterface> JsonFluxConnector::c_controlInterfaces =
+QMap<int, JsonFluxConnector::ControlInterface> JsonFluxConnector::UIControlInterfaces =
 {
     {
         JsonFluxConnector::TextField,
@@ -75,10 +75,33 @@ QMap<int, JsonFluxConnector::ControlInterface> JsonFluxConnector::c_controlInter
                 QVariant varIndex;
                 QMetaObject::invokeMethod(control, "find", Q_RETURN_ARG(QVariant, varIndex), Q_ARG(QVariant, variant));
                 strIndex = varIndex.value<int>();
-                return control->setProperty("currentIndex", strIndex);
+                if(strIndex == -1)
+                    return false;
+                else
+                    return control->setProperty("currentIndex", strIndex);
             }
         }
-    }
+    }/*,
+
+    {
+        JsonFluxConnector::ListView,
+        {
+            SIGNAL(currentTextChanged()), "currentText",
+            [](QObject *control)->QVariant{
+                return control->property("currentText").value<QString>();
+            },
+            [](QObject *control, QVariant variant)->bool{
+                auto strIndex = -1;
+                QVariant varIndex;
+                QMetaObject::invokeMethod(control, "find", Q_RETURN_ARG(QVariant, varIndex), Q_ARG(QVariant, variant));
+                strIndex = varIndex.value<int>();
+                if(strIndex == -1)
+                    return false;
+                else
+                    return control->setProperty("currentIndex", strIndex);
+            }
+        }
+    }*/
 };
 
 JsonFluxConnector::JsonFluxConnector(JsonFluxModel *modelObject, QObject *parent)
@@ -92,7 +115,7 @@ JsonFluxConnector::JsonFluxConnector(JsonFluxModel *modelObject, QObject *parent
 
 JsonFluxConnector::~JsonFluxConnector()
 {
-    qDebug()<<"Connector destroyed";
+    //qDebug()<<"Connector destroyed";
 }
 
 bool JsonFluxConnector::enabled() const
@@ -291,20 +314,20 @@ void JsonFluxConnector::onControlContentChanged()
 
 const char * JsonFluxConnector::controlChangeSignal(int type)
 {
-    return c_controlInterfaces[type].propertyChangeSignal;
+    return UIControlInterfaces[type].propertyChangeSignal;
 }
 
 const char* JsonFluxConnector::controlPropretyName(int type)
 {
-    return c_controlInterfaces[type].propertyName;
+    return UIControlInterfaces[type].propertyName;
 }
 
 JsonFluxConnector::GET_CONTENT_FUNC JsonFluxConnector::controlGetContent(int type)
 {
-    return c_controlInterfaces[type].getContent;
+    return UIControlInterfaces[type].getContent;
 }
 
 JsonFluxConnector::SET_CONTENT_FUNC JsonFluxConnector::controlSetContent(int type)
 {
-    return c_controlInterfaces[type].setContent;
+    return UIControlInterfaces[type].setContent;
 }
