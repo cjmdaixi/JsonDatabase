@@ -3,6 +3,7 @@
 #include "jsonfluxmodel.h"
 #include "jsonfluxview.h"
 #include "jsonfluxmodifier.h"
+#include <QRegularExpression>
 
 JsonFluxListModel::JsonFluxListModel(JsonFluxModel *modelObject, QString query, QObject *parent)
     : QAbstractListModel(parent), m_modelObject(modelObject)
@@ -50,8 +51,10 @@ void JsonFluxListModel::onValuesChanged()
     for (auto it = values.begin(); it != values.end(); ++it)
     {
         auto query = it.key();
-        if(query[0] != '@')
+        if(query[0] == '@')
         {
+            auto queryIdx = query.right(query.length() - 1).toInt();
+            auto role = m_rolesAndQueries[queryIdx].first;
             newValues.push_back(it.value());
         }
     }
@@ -116,15 +119,61 @@ void JsonFluxListModel::removeAbsentValues(QVariantList newValues)
     }
 }
 
-QString JsonFluxListModel::query() const
+QString JsonFluxListModel::rootPath() const
 {
-    return m_fluxView->query().front();
+    return m_rootPath;
 }
 
-void JsonFluxListModel::setQuery(QString newQuery)
+void JsonFluxListModel::setRootPath(QString newRootPath)
 {
-    if(m_fluxView->query().front() == newQuery) return;
+    if(m_rootPath == newRootPath) return;
 
-    m_fluxView->setQuery(QStringList(newQuery));
-    emit queryChanged();
+    m_rootPath = newRootPath;
+
+    m_rootPath.remove(QRegularExpression("/*$"));
+    QStringList queries;
+
+    for (auto p : m_rolesAndQueries)
+    {
+        queries << m_rootPath + "/" + p.second;
+    }
+
+    m_fluxView->setQuery(queries);
+    emit rootPathChanged();
+}
+
+QVariantList JsonFluxListModel::rolesAndQueries() const
+{
+    QVariantList results;
+    for(auto it = m_rolesAndQueries.begin(); it != m_rolesAndQueries.end(); ++it)
+    {
+        QVariantMap vm;
+        vm["role"] = it->first;
+        vm["query"] = it->second;
+        results.push_back(vm);
+    }
+    return results;
+}
+
+void JsonFluxListModel::setRolesAndQueries(QVariantList newRolesAndQueries)
+{
+    decltype(m_rolesAndQueries) newRAQ;
+    for(auto v : newRolesAndQueries)
+    {
+        auto vm = v.value<QVariantMap>();
+        auto r = vm["role"].value<QString>();
+        auto q = vm["query"].value<QString>();
+        newRAQ.push_back(QPair<QString, QString>(r, q));
+    }
+
+    if(newRAQ == m_rolesAndQueries) return;
+
+    m_rolesAndQueries = newRAQ;
+    m_roles.clear();
+    for(auto i = 0; i != m_rolesAndQueries.size(); ++i)
+    {
+        m_roles[i] = m_rolesAndQueries[i].first.toLatin1();
+    }
+
+    emit rolesAndQueriesChanged();
 }

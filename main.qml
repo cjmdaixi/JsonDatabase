@@ -58,14 +58,14 @@ Window {
     Component.onCompleted: {
         var connector = JsonFlux.getOrCreateConnector("myConnector", jsonModel);
         connector.addConnections( [
-                    {"control": textField1, "type": JsonFluxConnector.TextField, "query": "/widget/debug/0"},
-                    {"control": textField2, "type": JsonFluxConnector.TextField, "query": "/widget/debug/0"},
-                    {"control": spinBox1, "type": JsonFluxConnector.SpinBox, "query": "/widget/image/hOffset"},
-                    {"control": spinBox2, "type": JsonFluxConnector.SpinBox, "query": "/widget/image/hOffset"},
-                    {"control": switch1, "type": JsonFluxConnector.Switch, "query": "/widget/image/mipmap"},
-                    {"control": switch2, "type": JsonFluxConnector.Switch, "query": "/widget/image/mipmap"}
-                    //
-                ]);
+                                     {"control": textField1, "type": JsonFluxConnector.TextField, "query": "/widget/debug/0"},
+                                     {"control": textField2, "type": JsonFluxConnector.TextField, "query": "/widget/debug/0"},
+                                     {"control": spinBox1, "type": JsonFluxConnector.SpinBox, "query": "/widget/image/hOffset"},
+                                     {"control": spinBox2, "type": JsonFluxConnector.SpinBox, "query": "/widget/image/hOffset"},
+                                     {"control": switch1, "type": JsonFluxConnector.Switch, "query": "/widget/image/mipmap"},
+                                     {"control": switch2, "type": JsonFluxConnector.Switch, "query": "/widget/image/mipmap"}
+                                     //
+                                 ]);
     }
 
     TextField{
@@ -142,9 +142,9 @@ Window {
         height: 20
         anchors{centerIn: parent; horizontalCenterOffset: -100; verticalCenterOffset: 150}
         model: JsonFlux.getOrCreateListModel("myList", "/widget/testArray", jsonModel)
-//        delegate: Text{
-//            text: "aaa"
-//        }
+        //        delegate: Text{
+        //            text: "aaa"
+        //        }
         //textRole: "textRole"
     }
 }
