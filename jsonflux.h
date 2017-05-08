@@ -41,6 +41,8 @@ public:
     static json::value_type toJsonValue(QVariant variant);
     static json::value_type toJsonObject(QVariantMap vm);
     static json::value_type toJsonArray(QVariantList vl);
+
+    static void dumpToFile(json &jo, const char *file);
 signals:
     void updated(JsonFluxModel *model);
 public slots:

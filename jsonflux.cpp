@@ -5,6 +5,7 @@
 #include "jsonfluxconnector.h"
 #include "jsonfluxlistmodel.h"
 #include <QQmlEngine>
+#include <fstream>
 
 Q_GLOBAL_STATIC(JsonFlux, gJsonFlux)
 
@@ -238,4 +239,12 @@ json::value_type JsonFlux::toJsonObject(QVariantMap vm)
         jsonVal[it.key().toStdString()] = toJsonValue(it.value());
     }
     return jsonVal;
+}
+
+void JsonFlux::dumpToFile(json &jo, const char *file)
+{
+    auto str = jo.dump(4);
+    std::ofstream outf(file);
+    outf<<str;
+    outf.close();
 }
