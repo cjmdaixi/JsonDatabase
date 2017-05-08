@@ -160,6 +160,7 @@ QVariantMap JsonFluxView::doQuery() const
         {
             if ((*jsonObject)[ptr] != json::value_t::null)
             {
+                auto jsonVal = (*jsonObject)[ptr];
                 auto v = JsonFlux::toVariant(jsonVal);
                 results[oneQuery] = v;
                 results[QString("@%1").arg(i)] = v;
