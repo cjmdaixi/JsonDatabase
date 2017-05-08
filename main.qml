@@ -137,22 +137,22 @@ Window {
 
     }
 
-//    ComboBox{
-//        id: comboBox3
-//        width: 120
-//        height: 20
-//        anchors{centerIn: parent; horizontalCenterOffset: -100; verticalCenterOffset: 150}
-//        model: JsonFlux.getOrCreateListModel("myList", "/widget/image", ["$key"], jsonModel)
-//        textRole: "$key"
-//    }
     ComboBox{
-        id: comboBox4
+        id: comboBox3
         width: 120
         height: 20
         anchors{centerIn: parent; horizontalCenterOffset: -100; verticalCenterOffset: 150}
-        model: JsonFlux.getOrCreateListModel("myList", "/widget/testArray", ["xname"], jsonModel)
-        textRole: "xname"
+        model: JsonFlux.getOrCreateListModel("myList", "/widget/image", [], jsonModel)
+        textRole: "$key"
     }
+//    ComboBox{
+//        id: comboBox4
+//        width: 120
+//        height: 20
+//        anchors{centerIn: parent; horizontalCenterOffset: -100; verticalCenterOffset: 150}
+//        model: JsonFlux.getOrCreateListModel("myList", "/widget/testArray", ["xname"], jsonModel)
+//        textRole: "xname"
+//    }
 
 //    ListView{
 //        id: listView1
