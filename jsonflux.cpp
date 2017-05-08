@@ -82,21 +82,21 @@ JsonFluxListModel * JsonFlux::listModel(QString listName)
     return m_listModels.value(listName, Q_NULLPTR);
 }
 
-JsonFluxListModel * JsonFlux::getOrCreateListModel(QString listName, QString query, QString modelName)
+JsonFluxListModel * JsonFlux::getOrCreateListModel(QString listName, QString query, QStringList roles, QString modelName)
 {
     auto modelObject = model(modelName);
     if(modelObject == Q_NULLPTR) return Q_NULLPTR;
 
-    return getOrCreateListModel(listName, query, modelObject);
+    return getOrCreateListModel(listName, query, roles, modelObject);
 }
 
-JsonFluxListModel * JsonFlux::getOrCreateListModel(QString listName, QString query, JsonFluxModel *modelObject)
+JsonFluxListModel * JsonFlux::getOrCreateListModel(QString listName, QString query, QStringList roles, JsonFluxModel *modelObject)
 {
     if(modelObject == Q_NULLPTR) return Q_NULLPTR;
 
     if(listModel(listName)) return listModel(listName);
 
-    auto newListModel = new JsonFluxListModel(modelObject, query, this);
+    auto newListModel = new JsonFluxListModel(modelObject, query, roles, this);
     QQmlEngine::setObjectOwnership(newListModel, QQmlEngine::CppOwnership);
 
     m_listModels[listName] = newListModel;

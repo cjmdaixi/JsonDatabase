@@ -16,24 +16,24 @@ class JsonFluxListModel : public QAbstractListModel
     Q_OBJECT
 public:
 
-    Q_PROPERTY(QString rootPath READ rootPath WRITE setRootPath NOTIFY rootPathChanged)
-    Q_PROPERTY(QVariantList rolesAndQueries READ rolesAndQueries WRITE setRolesAndQueries NOTIFY rolesAndQueriesChanged)
+    Q_PROPERTY(QString query READ query WRITE setQuery NOTIFY queryChanged)
+    Q_PROPERTY(QStringList roles READ roles WRITE setRoles NOTIFY rolesChanged)
 
-    explicit JsonFluxListModel(JsonFluxModel * modelObject, QString query, QObject *parent = nullptr);
+    explicit JsonFluxListModel(JsonFluxModel * modelObject, QString query, QStringList roles, QObject *parent = nullptr);
     ~JsonFluxListModel();
 
     QHash<int, QByteArray> roleNames() const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
 
-    QString rootPath() const;
-    void setRootPath(QString newRootPath);
+    QString query() const;
+    void setQuery(QString newQuery);
 
-    QVariantList rolesAndQueries() const;
-    void setRolesAndQueries(QVariantList newRolesAndQueries);
+    QStringList roles() const;
+    void setRoles(QStringList newRoles);
 signals:
-    void rootPathChanged();
-    void rolesAndQueriesChanged();
+    void queryChanged();
+    void rolesChanged();
 private slots:
     void onValuesChanged();
 private:
@@ -43,9 +43,8 @@ private:
     JsonFluxView *m_fluxView = Q_NULLPTR;
     JsonFluxModifier *m_fluxModifier = Q_NULLPTR;
     QVariantList m_values;
-    QString m_rootPath = "/";
-    QHash<int, QByteArray> m_roles;
-    QList<QPair<QString, QString>> m_rolesAndQueries;
+    QString m_query = "/";
+    QStringList m_roles;
 };
 
 #endif // JSONFLUXLISTMODEL_H

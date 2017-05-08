@@ -2,6 +2,7 @@ import QtQuick 2.6
 import QtQuick.Window 2.2
 import JsonFlux 1.0
 import QtQuick.Controls 1.4
+import QtQuick.Layouts 1.1
 
 Window {
     visible: true
@@ -141,10 +142,24 @@ Window {
         width: 120
         height: 20
         anchors{centerIn: parent; horizontalCenterOffset: -100; verticalCenterOffset: 150}
-        model: JsonFlux.getOrCreateListModel("myList", "/widget/testArray", jsonModel)
-        //        delegate: Text{
-        //            text: "aaa"
-        //        }
-        //textRole: "textRole"
+        model: JsonFlux.getOrCreateListModel("myList", "/widget/testArray", ["xname", "age"], jsonModel)
+        textRole: "xname"
+    }
+
+    ListView{
+        id: listView1
+        width: 120
+        height: 120
+        anchors{centerIn: parent; horizontalCenterOffset: 100; verticalCenterOffset: 150}
+        model: JsonFlux.getOrCreateListModel("myList", "/widget/testArray", ["xname", "age"], jsonModel)
+        delegate: RowLayout{
+            height: 20
+            Text{
+                text: xname
+            }
+            Text{
+                text: age
+            }
+        }
     }
 }

@@ -29,8 +29,8 @@ public:
     Q_INVOKABLE JsonFluxConnector * getOrCreateConnector(QString connectorName, JsonFluxModel *modelObject);
 
     Q_INVOKABLE JsonFluxListModel * listModel(QString listName);
-    Q_INVOKABLE JsonFluxListModel * getOrCreateListModel(QString listName, QString query, QString modelName);
-    Q_INVOKABLE JsonFluxListModel * getOrCreateListModel(QString listName, QString query, JsonFluxModel *modelObject);
+    Q_INVOKABLE JsonFluxListModel * getOrCreateListModel(QString listName, QString query, QStringList roles, QString modelName);
+    Q_INVOKABLE JsonFluxListModel * getOrCreateListModel(QString listName, QString query, QStringList roles, JsonFluxModel *modelObject);
 
     bool registerModel(QString modelName, JsonFluxModel *model);
     bool unregisterModel(QString modelName, bool deleteModel = false);
