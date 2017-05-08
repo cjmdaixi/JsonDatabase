@@ -12,6 +12,14 @@ class JsonFluxModifier : public QObject
 {
     Q_OBJECT
 public:
+    enum ModifyType
+    {
+        ReplaceOrInsert,
+        Append,
+        Remove
+    };
+    Q_ENUM(ModifyType)
+
     Q_PROPERTY(JsonFluxModel* model READ model WRITE setModel NOTIFY modelChanged)
     Q_PROPERTY(QString modelName READ modelName WRITE setModelName NOTIFY modelChanged)
     Q_PROPERTY(QString path READ path WRITE setPath NOTIFY pathChanged)
@@ -29,13 +37,13 @@ public:
     QString path() const;
     void setPath(QString newPath);
 
-    Q_INVOKABLE bool modify(QString jsonPath, QVariant newValue);
-    Q_INVOKABLE bool modify(QString jsonPath, QVariantList newValues);
-    Q_INVOKABLE bool modify(QString jsonPath, QVariantMap newObject);
+    Q_INVOKABLE bool modify(ModifyType modifyType, QString jsonPath, QVariant value);
+    Q_INVOKABLE bool modify(ModifyType modifyType, QString jsonPath, QVariantList values);
+    Q_INVOKABLE bool modify(ModifyType modifyType, QString jsonPath, QVariantMap object);
 
-    Q_INVOKABLE bool modify(QVariant newValue);
-    Q_INVOKABLE bool modify(QVariantList newValues);
-    Q_INVOKABLE bool modify(QVariantMap newObject);
+    Q_INVOKABLE bool modify(ModifyType modifyType, QVariant value);
+    Q_INVOKABLE bool modify(ModifyType modifyType, QVariantList values);
+    Q_INVOKABLE bool modify(ModifyType modifyType, QVariantMap object);
 signals:
     void modelChanged();
     void pathChanged();

@@ -14,27 +14,7 @@
             "src": "Images/Sun.png",
             "vOffset": 250
         },
-        "testArray": [
-            {
-                "age": 20,
-                "dep": "algorithm",
-                "xname": "jimmy"
-            },
-            {
-                "age": 23,
-                "dep": "count",
-                "xname": "lucy"
-            },
-            {
-                "age": 24,
-                "dep": "web",
-                "xname": "lily"
-            },
-            {
-                "age": 5,
-                "xname": "fang"
-            }
-        ],
+        "testArray": [],
         "text": {
             "alignment": "center",
             "data": "Click Here",

@@ -212,6 +212,9 @@ json::value_type JsonFlux::toJsonValue(QVariant variant)
     case QMetaType::QJsonValue:
         jsonValue = toJsonArray(variant.value<QVariantList>());
         break;
+    case QMetaType::QVariantList:
+        jsonValue = toJsonArray(variant.value<QVariantList>());
+        break;
     case QMetaType::QVariantMap:
         jsonValue = toJsonObject(variant.value<QVariantMap>());
         break;

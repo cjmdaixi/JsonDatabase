@@ -52,41 +52,100 @@ void JsonFluxModifier::setModelName(QString newModelName)
     setModel(newModelObj);
 }
 
-bool JsonFluxModifier::modify(QString jsonPath, QVariant newValue)
+bool JsonFluxModifier::modify(ModifyType modifyType, QString jsonPath, QVariant value)
 {
     if(m_modelObject == Q_NULLPTR) return false;
-    return m_modelObject->modify(jsonPath, newValue);
+    switch (modifyType)
+    {
+    case ReplaceOrInsert:
+        return m_modelObject->modify(jsonPath, value);
+    case Append:
+        return m_modelObject->append(jsonPath, value);
+    case Remove:
+        if(value.type() == QMetaType::Int)
+            return m_modelObject->remove(jsonPath, value.value<int>());
+        else if(value.type() == QMetaType::QString)
+            return m_modelObject->remove(jsonPath, value.value<QString>());
+    default:
+        break;
+    }
+    return false;
 }
 
-bool JsonFluxModifier::modify(QString jsonPath, QVariantList newValues)
+bool JsonFluxModifier::modify(ModifyType modifyType, QString jsonPath, QVariantList values)
 {
     if(m_modelObject == Q_NULLPTR) return false;
-    return m_modelObject->modify(jsonPath, newValues);
+    switch (modifyType)
+    {
+    case ReplaceOrInsert:
+        return m_modelObject->modify(jsonPath, values);
+    case Append:
+        return m_modelObject->append(jsonPath, values);
+    default:
+        break;
+    }
+    return false;
 }
 
-bool JsonFluxModifier::modify(QString jsonPath, QVariantMap newObject)
+bool JsonFluxModifier::modify(ModifyType modifyType, QString jsonPath, QVariantMap object)
 {
     if(m_modelObject == Q_NULLPTR) return false;
-    return m_modelObject->modify(jsonPath, newObject);
+    switch (modifyType)
+    {
+    case ReplaceOrInsert:
+        return m_modelObject->modify(jsonPath, object);
+    case Append:
+        return m_modelObject->append(jsonPath, object);
+    default:
+        break;
+    }
+    return false;
 }
 
 
-bool JsonFluxModifier::modify(QVariant newValue)
+bool JsonFluxModifier::modify(ModifyType modifyType, QVariant value)
 {
     if(m_modelObject == Q_NULLPTR) return false;
-    return m_modelObject->modify(m_path, newValue);
+    switch (modifyType)
+    {
+    case ReplaceOrInsert:
+        return m_modelObject->modify(m_path, value);
+    case Append:
+        return m_modelObject->append(m_path, value);
+    default:
+        break;
+    }
+    return false;
 }
 
-bool JsonFluxModifier::modify(QVariantList newValues)
+bool JsonFluxModifier::modify(ModifyType modifyType, QVariantList values)
 {
     if(m_modelObject == Q_NULLPTR) return false;
-    return m_modelObject->modify(m_path, newValues);
+    switch (modifyType)
+    {
+    case ReplaceOrInsert:
+        return m_modelObject->modify(m_path, values);
+    case Append:
+        return m_modelObject->append(m_path, values);
+    default:
+        break;
+    }
+    return false;
 }
 
-bool JsonFluxModifier::modify(QVariantMap newObject)
+bool JsonFluxModifier::modify(ModifyType modifyType, QVariantMap object)
 {
     if(m_modelObject == Q_NULLPTR) return false;
-    return m_modelObject->modify(m_path, newObject);
+    switch (modifyType)
+    {
+    case ReplaceOrInsert:
+        return m_modelObject->modify(m_path, object);
+    case Append:
+        return m_modelObject->append(m_path, object);
+    default:
+        break;
+    }
+    return false;
 }
 
 QString JsonFluxModifier::path() const

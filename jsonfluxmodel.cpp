@@ -178,6 +178,168 @@ bool JsonFluxModel::modify(QString jsonPath, QVariantMap newObject)
     }
 }
 
+bool JsonFluxModel::append(QString jsonArrayPath, QVariant newValue)
+{
+    json::json_pointer ptr(jsonArrayPath.toStdString());
+    json::value_type jsonArray;
+    try
+    {
+        jsonArray = m_json.at(ptr);
+    }
+    catch(std::out_of_range&)
+    {
+        qCritical()<<"The jsonpath is invalid!";
+        return false;
+    }
+
+    if(!jsonArray.is_array())
+    {
+        qCritical()<<jsonArrayPath<<"isn't pointing to an array node!";
+        return false;
+    }
+    jsonArray.push_back(JsonFlux::toJsonValue(newValue));
+
+    emit updated();
+
+    if(m_fileSync)
+        return save();
+    else
+    {
+        setModified(true);
+        return true;
+    }
+}
+
+bool JsonFluxModel::append(QString jsonArrayPath, QVariantList newValues)
+{
+    json::json_pointer ptr(jsonArrayPath.toStdString());
+    json::value_type jsonArray;
+    try
+    {
+        jsonArray = m_json.at(ptr);
+    }
+    catch(std::out_of_range&)
+    {
+        qCritical()<<"The jsonpath is invalid!";
+        return false;
+    }
+
+    if(!jsonArray.is_array())
+    {
+        qCritical()<<jsonArrayPath<<"isn't pointing to an array node!";
+        return false;
+    }
+    jsonArray.push_back(JsonFlux::toJsonArray(newValues));
+    emit updated();
+
+    if(m_fileSync)
+        return save();
+    else
+    {
+        setModified(true);
+        return true;
+    }
+}
+bool JsonFluxModel::append(QString jsonArrayPath, QVariantMap newArrayElement)
+{
+    json::json_pointer ptr(jsonArrayPath.toStdString());
+    try
+    {
+        json::reference jsonArray = m_json.at(ptr);
+        if(!jsonArray.is_array())
+        {
+            qCritical()<<jsonArrayPath<<"isn't pointing to an array node!";
+            return false;
+        }
+        //JsonFlux::dumpToFile(m_json, "A:/prev.json");
+        jsonArray.push_back(JsonFlux::toJsonObject(newArrayElement));
+        //JsonFlux::dumpToFile(m_json, "A:/after.json");
+    }
+    catch(std::out_of_range&)
+    {
+        qCritical()<<"The jsonpath is invalid!";
+        return false;
+    }
+
+    emit updated();
+
+    if(m_fileSync)
+        return save();
+    else
+    {
+        setModified(true);
+        return true;
+    }
+}
+
+bool JsonFluxModel::remove(QString jsonArrayPath, int idx)
+{
+    json::json_pointer ptr(jsonArrayPath.toStdString());
+
+    try
+    {
+        json::reference jsonArray = m_json.at(ptr);
+        if(!jsonArray.is_array())
+        {
+            qCritical()<<jsonArrayPath<<"isn't pointing to an array node!";
+            return false;
+        }
+        jsonArray.erase(idx);
+    }
+    catch(std::out_of_range&)
+    {
+        qCritical()<<"The jsonpath is invalid!";
+        return false;
+    }
+
+    emit updated();
+
+    if(m_fileSync)
+        return save();
+    else
+    {
+        setModified(true);
+        return true;
+    }
+}
+
+bool JsonFluxModel::remove(QString jsonPath, QString key)
+{
+    json::json_pointer ptr(jsonPath.toStdString());
+
+    try
+    {
+        json::reference jsonObject = m_json.at(ptr);
+        if(!jsonObject.is_object())
+        {
+            qCritical()<<jsonPath<<"isn't pointing to an object node!";
+            return false;
+        }
+        auto it = jsonObject.find(key.toStdString());
+        if(it == jsonObject.end())
+        {
+            qCritical()<<jsonPath<<"has no such key:"<<key;
+            return false;
+        }
+        jsonObject.erase(it);
+    }
+    catch(std::out_of_range&)
+    {
+        qCritical()<<"The jsonpath is invalid!";
+        return false;
+    }
+
+    emit updated();
+
+    if(m_fileSync)
+        return save();
+    else
+    {
+        setModified(true);
+        return true;
+    }
+}
+
 bool JsonFluxModel::modified() const
 {
     return m_modified;
@@ -234,3 +396,5 @@ bool JsonFluxModel::saveAs(QString filePath)
     emit sourceChanged();
     return true;
 }
+
+

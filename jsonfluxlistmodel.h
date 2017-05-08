@@ -40,6 +40,11 @@ public:
 
     QStringList roles() const;
     void setRoles(QStringList newRoles);
+
+    Q_INVOKABLE void addElement(QVariantMap newElement);
+    Q_INVOKABLE void addElements(QVariantList newElements);
+
+    Q_INVOKABLE void removeElement(int idx);
 signals:
     void queryChanged();
     void rolesChanged();
@@ -53,7 +58,6 @@ private:
     JsonFluxView *m_fluxView = Q_NULLPTR;
     JsonFluxModifier *m_fluxModifier = Q_NULLPTR;
     QVariantList m_values;
-    QString m_query = "/";
     QStringList m_roles;
     ModelType m_modeltype = MTArray;
 };

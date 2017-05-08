@@ -306,7 +306,7 @@ void JsonFluxConnector::onControlContentChanged()
     auto getContent = controlGetContent(conn.controlType);
     auto newValue = getContent(conn.control);
 
-    if(!m_fluxModifier->modify(newValue))
+    if(!m_fluxModifier->modify(JsonFluxModifier::ReplaceOrInsert, newValue))
     {
         qCritical()<<"Cannot modify control"<<conn.control->objectName();
     }

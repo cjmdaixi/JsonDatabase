@@ -167,24 +167,16 @@ void JsonFluxListModel::setModel(JsonFluxModel *newModel)
 
 QString JsonFluxListModel::query() const
 {
-    return m_query;
+    auto queries = m_fluxView->query();
+    return queries.empty()? QString() : queries[0];
 }
 
 void JsonFluxListModel::setQuery(QString newQuery)
 {
-    if(m_query == newQuery) return;
+    newQuery.remove(QRegularExpression("/*$"));
+    if(query() == newQuery) return;
 
-    m_query = newQuery;
-
-    m_query.remove(QRegularExpression("/*$"));
-    QStringList queries;
-
-    for (auto query : m_roles)
-    {
-        queries << m_query + "/" + query;
-    }
-
-    m_fluxView->setQuery(queries);
+    m_fluxView->setQuery(QStringList(newQuery));
     emit queryChanged();
 }
 
@@ -202,4 +194,42 @@ void JsonFluxListModel::setRoles(QStringList newRoles)
         m_roles << "$";
 
     emit rolesChanged();
+}
+
+void JsonFluxListModel::addElement(QVariantMap newElement)
+{
+    if(m_modeltype == MTObject)
+    {
+        auto key = newElement["$key"].value<QString>();
+        auto value = newElement["$value"];
+        m_fluxModifier->modify(JsonFluxModifier::ReplaceOrInsert, query() + "/" + key, value);
+    }
+    else
+    {
+        m_fluxModifier->modify(JsonFluxModifier::Append, query(), newElement);
+    }
+}
+
+void JsonFluxListModel::addElements(QVariantList newElements)
+{
+    for(auto v : newElements)
+    {
+        addElement(v.value<QVariantMap>());
+    }
+}
+
+void JsonFluxListModel::removeElement(int idx)
+{
+    if(idx < 0 || idx > m_values.size()) return;
+
+    if(m_modeltype == MTObject)
+    {
+        auto vm = m_values[idx].value<QVariantMap>();
+        auto key = vm["$key"].value<QString>();
+        m_fluxModifier->modify(JsonFluxModifier::Remove, query(), key);
+    }
+    else
+    {
+        m_fluxModifier->modify(JsonFluxModifier::Remove, query(), idx);
+    }
 }

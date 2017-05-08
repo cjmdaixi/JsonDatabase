@@ -44,6 +44,13 @@ public:
     bool modify(QString jsonPath, QVariantList newValues);
     bool modify(QString jsonPath, QVariantMap newObject);
 
+    bool append(QString jsonArrayPath, QVariant newValue);
+    bool append(QString jsonArrayPath, QVariantList newValues);
+    bool append(QString jsonArrayPath, QVariantMap newArrayElement);
+
+    bool remove(QString jsonArrayPath, int idx);
+    bool remove(QString jsonPath, QString key);
+
     bool save();
 
     Q_INVOKABLE bool saveAs(QString filePath);
