@@ -15,6 +15,11 @@ class JsonFluxListModel : public QAbstractListModel
 {
     Q_OBJECT
 public:
+    enum ModelType
+    {
+        MTArray,
+        MTObject
+    };
 
     Q_PROPERTY(QString query READ query WRITE setQuery NOTIFY queryChanged)
     Q_PROPERTY(QStringList roles READ roles WRITE setRoles NOTIFY rolesChanged)
@@ -45,6 +50,7 @@ private:
     QVariantList m_values;
     QString m_query = "/";
     QStringList m_roles;
+    ModelType m_modeltype = MTArray;
 };
 
 #endif // JSONFLUXLISTMODEL_H

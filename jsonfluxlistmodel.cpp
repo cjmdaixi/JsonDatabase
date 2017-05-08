@@ -59,21 +59,38 @@ void JsonFluxListModel::onValuesChanged()
 {
     auto values = m_fluxView->values();
 
-    QVariantList jsonArray;
+    QVariantList newValues;
     for (auto it = values.begin(); it != values.end(); ++it)
     {
         auto query = it.key();
         if(query[0] == '@')
-        {
-            jsonArray = it.value().value<QVariantList>();
+        {  
+            auto v = it.value();
+            if(v.type() == QMetaType::QVariantList)
+            {
+                newValues = v.value<QVariantList>();
+                m_modeltype = MTArray;
+            }
+            else if(v.type() == QMetaType::QVariantMap)
+            {
+                auto jsonObject = v.value<QVariantMap>();
+                m_modeltype = MTObject;
+                for(auto it2 = jsonObject.begin(); it2 != jsonObject.end(); ++it2)
+                {
+                    QVariantMap newVM;
+                    newVM.insert("$key", it2.key());
+                    newVM.insert("$value", it2.value());
+                    newValues.push_back(newVM);
+                }
+            }
             break;
         }
     }
 
-    if(jsonArray.empty())
+    if(newValues.empty())
         return;
 
-    removeAbsentValues(jsonArray);
+    removeAbsentValues(newValues);
 
     auto findIf = [&](QVariant newVal)->bool{
         for(auto oldVal : m_values)
@@ -84,7 +101,7 @@ void JsonFluxListModel::onValuesChanged()
         return false;
     };
 
-    for(auto newVal : jsonArray)
+    for(auto newVal : newValues)
     {
         if(!findIf(newVal))
         {

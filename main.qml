@@ -137,29 +137,37 @@ Window {
 
     }
 
+//    ComboBox{
+//        id: comboBox3
+//        width: 120
+//        height: 20
+//        anchors{centerIn: parent; horizontalCenterOffset: -100; verticalCenterOffset: 150}
+//        model: JsonFlux.getOrCreateListModel("myList", "/widget/image", ["$key"], jsonModel)
+//        textRole: "$key"
+//    }
     ComboBox{
-        id: comboBox3
+        id: comboBox4
         width: 120
         height: 20
         anchors{centerIn: parent; horizontalCenterOffset: -100; verticalCenterOffset: 150}
-        model: JsonFlux.getOrCreateListModel("myList", "/widget/testArray", ["xname", "age"], jsonModel)
+        model: JsonFlux.getOrCreateListModel("myList", "/widget/testArray", ["xname"], jsonModel)
         textRole: "xname"
     }
 
-    ListView{
-        id: listView1
-        width: 120
-        height: 120
-        anchors{centerIn: parent; horizontalCenterOffset: 100; verticalCenterOffset: 150}
-        model: JsonFlux.getOrCreateListModel("myList", "/widget/testArray", ["xname", "age"], jsonModel)
-        delegate: RowLayout{
-            height: 20
-            Text{
-                text: xname
-            }
-            Text{
-                text: $.dep
-            }
-        }
-    }
+//    ListView{
+//        id: listView1
+//        width: 120
+//        height: 120
+//        anchors{centerIn: parent; horizontalCenterOffset: 100; verticalCenterOffset: 150}
+//        model: JsonFlux.getOrCreateListModel("myList", "/widget/testArray", ["xname", "age"], jsonModel)
+//        delegate: RowLayout{
+//            height: 20
+//            Text{
+//                text: xname
+//            }
+//            Text{
+//                text: $.dep
+//            }
+//        }
+//    }
 }
