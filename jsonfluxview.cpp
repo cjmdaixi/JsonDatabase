@@ -158,14 +158,20 @@ QVariantMap JsonFluxView::doQuery() const
         json::json_pointer ptr(oneQuery.toStdString());
         try
         {
-            auto jsonVal = (*jsonObject)[ptr];
-            auto v = JsonFlux::toVariant(jsonVal);
-            results[oneQuery] = v;
-            results[QString("@%1").arg(i)] = v;
+            if ((*jsonObject)[ptr] != json::value_t::null)
+            {
+                auto v = JsonFlux::toVariant(jsonVal);
+                results[oneQuery] = v;
+                results[QString("@%1").arg(i)] = v;
+            }
+            else
+            {
+                qDebug() << oneQuery << "doesn't exist!";
+            }
         }
-        catch(std::out_of_range&)
+        catch (std::out_of_range&)
         {
-            qCritical()<<oneQuery<<"doesn't exist!";
+            qCritical() << oneQuery << "doesn't exist!";
         }
     }
     return results;
