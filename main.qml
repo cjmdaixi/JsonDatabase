@@ -158,7 +158,7 @@ Window {
                 text: xname
             }
             Text{
-                text: age
+                text: $.dep
             }
         }
     }

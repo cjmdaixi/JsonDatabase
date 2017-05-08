@@ -12,6 +12,10 @@ JsonFluxListModel::JsonFluxListModel(JsonFluxModel *modelObject, QString query, 
     m_fluxModifier = new JsonFluxModifier(m_modelObject, this);
 
     QObject::connect(m_fluxView, &JsonFluxView::valuesChanged, this, &JsonFluxListModel::onValuesChanged);
+
+    if(!m_roles.contains("$"))
+        m_roles << "$";
+
     m_fluxView->setQuery(QStringList(query));
 }
 
@@ -33,7 +37,11 @@ QVariant JsonFluxListModel::data(const QModelIndex &index, int role) const
 
     auto vm = m_values[index.row()].value<QVariantMap>();
     auto roleName = m_roles[role];
-    return vm[roleName];
+    if(roleName == "$"){
+        return vm;
+    }
+    else
+        return vm[roleName];
 }
 
 QHash<int, QByteArray> JsonFluxListModel::roleNames() const
@@ -153,6 +161,8 @@ void JsonFluxListModel::setRoles(QStringList newRoles)
     if(newRoles == m_roles) return;
 
     m_roles = newRoles;
+    if(!m_roles.contains("$"))
+        m_roles << "$";
 
     emit rolesChanged();
 }

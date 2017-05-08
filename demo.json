@@ -15,9 +15,9 @@
             "vOffset": 250
         },
         "testArray":[
-        {"xname": "jimmy", "age": 20},
-        {"xname": "lucy", "age": 23},
-        {"xname": "lily", "age": 24}
+        {"xname": "jimmy", "age": 20, "dep": "algorithm"},
+        {"xname": "lucy", "age": 23, "dep": "count"},
+        {"xname": "lily", "age": 24, "dep": "web"}
         ],
         "text": {
             "alignment": "center",
