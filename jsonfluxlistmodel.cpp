@@ -17,6 +17,8 @@ JsonFluxListModel::JsonFluxListModel(JsonFluxModel *modelObject, QString query, 
         m_roles << "$";
     if(!m_roles.contains("$key"))
         m_roles << "$key";
+    if(!m_roles.contains("$value"))
+        m_roles << "$value";
 
     m_fluxView->setQuery(QStringList(query));
 }
