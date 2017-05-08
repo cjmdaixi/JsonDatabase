@@ -94,7 +94,14 @@ JsonFluxListModel * JsonFlux::getOrCreateListModel(QString listName, QString que
 {
     if(modelObject == Q_NULLPTR) return Q_NULLPTR;
 
-    if(listModel(listName)) return listModel(listName);
+    if(listModel(listName))
+    {
+        auto lm = listModel(listName);
+        lm->setQuery(query);
+        lm->setRoles(roles);
+        lm->setModel(modelObject);
+        return lm;
+    }
 
     auto newListModel = new JsonFluxListModel(modelObject, query, roles, this);
     QQmlEngine::setObjectOwnership(newListModel, QQmlEngine::CppOwnership);

@@ -23,6 +23,7 @@ public:
 
     Q_PROPERTY(QString query READ query WRITE setQuery NOTIFY queryChanged)
     Q_PROPERTY(QStringList roles READ roles WRITE setRoles NOTIFY rolesChanged)
+    Q_PROPERTY(JsonFluxModel* model READ model WRITE setModel NOTIFY modelChanged)
 
     explicit JsonFluxListModel(JsonFluxModel * modelObject, QString query, QStringList roles, QObject *parent = nullptr);
     ~JsonFluxListModel();
@@ -30,6 +31,9 @@ public:
     QHash<int, QByteArray> roleNames() const;
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
+
+    JsonFluxModel *model() const;
+    void setModel(JsonFluxModel *newModel);
 
     QString query() const;
     void setQuery(QString newQuery);
@@ -39,6 +43,7 @@ public:
 signals:
     void queryChanged();
     void rolesChanged();
+    void modelChanged();
 private slots:
     void onValuesChanged();
 private:

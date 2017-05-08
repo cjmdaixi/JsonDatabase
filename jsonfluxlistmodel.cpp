@@ -149,6 +149,22 @@ void JsonFluxListModel::removeAbsentValues(QVariantList newValues)
     }
 }
 
+JsonFluxModel * JsonFluxListModel::model() const
+{
+    return m_modelObject;
+}
+
+void JsonFluxListModel::setModel(JsonFluxModel *newModel)
+{
+    if(m_modelObject == newModel) return;
+    m_modelObject = newModel;
+
+    m_fluxView->setModel(m_modelObject);
+    m_fluxModifier->setModel(m_modelObject);
+
+    emit modelChanged();
+}
+
 QString JsonFluxListModel::query() const
 {
     return m_query;
