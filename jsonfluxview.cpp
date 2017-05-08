@@ -162,7 +162,7 @@ QVariantMap JsonFluxView::doQuery() const
             results[oneQuery] = v;
             results[QString("@%1").arg(i)] = v;
         }
-        catch(std::out_of_range&)
+        catch (std::out_of_range&)
         {
             JsonFlux::dumpToFile(*jsonObject, "doQuery_out_range.json");
             qCritical()<<oneQuery<<"doesn't exist!";
